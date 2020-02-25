@@ -1,0 +1,55 @@
+import android.content.Intent;
+import android.app.Activity;
+import android.os.Environment;
+
+Activity act;
+String[] lines; 
+
+void settings() {
+  fullScreen();
+}
+
+void setup() {
+  background(#F9C454);
+  fill(#4A3A16);
+  textSize(38);
+  textAlign(CENTER);
+  text("Click on screen", width/2, height/3);
+  act = this.getActivity();
+}
+
+void draw() {
+  //if (img_loaded)  image(img, 0, 0);
+}
+
+void mousePressed() {  
+  searchFile();
+}
+
+public void searchFile() {
+  Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+  intent.setType("*/*");
+  act.startActivityForResult(intent, 7);
+}
+
+@Override
+  void onActivityResult(int requestCode, int resultCode, Intent data) {
+  switch(requestCode) {
+  case 7:
+    if (resultCode == Activity.RESULT_OK) {
+      String temp_path = data.getData().getPath();
+      int last_index =  temp_path.lastIndexOf(':');
+      temp_path = temp_path.substring(last_index+1);
+      String path = new String(Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ temp_path);
+      last_index = path.lastIndexOf('.');
+      String ext = path.substring(last_index+1);
+      if (ext.equals("txt") == true) {
+        lines = loadStrings(path);
+        printArray(lines);
+      } else {
+        println("Not a text file!");
+      }
+    }
+    break;
+  }
+}
