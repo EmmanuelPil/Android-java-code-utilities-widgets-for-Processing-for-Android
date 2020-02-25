@@ -1,0 +1,62 @@
+import android.content.DialogInterface;
+import android.app.Activity;
+import android.app.AlertDialog;
+
+CharSequence[] values = {" First Item ", " Second Item ", " Third Item "}; 
+Activity act;
+
+void setup() {
+  background(#F9C454);
+  fill(#4A3A16);
+  textSize(38);
+  textAlign(CENTER);
+  text("Click on screen", width/2, height/3);
+}
+
+void draw() {
+}  
+
+void dialogBox() {
+  act = this.getActivity();
+
+  act.runOnUiThread(new Runnable() {
+    public void run() {
+      AlertDialog.Builder builder = new AlertDialog.Builder(act);
+      builder.setTitle("Select Your Choice");
+      builder.setSingleChoiceItems(values, -1, new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, int item) {
+          switch(item)
+          {
+          case 0:
+            background(#F9C454);
+            text("Click on screen", width/2, height/3);
+            text("First Item Clicked", width/2, height/2);
+            break;
+          case 1:
+            background(#F9C454);
+            text("Click on screen", width/2, height/3);
+            text("Second Item Clicked", width/2, height/2);   
+            break;
+          case 2:
+            background(#F9C454);
+            text("Click on screen", width/2, height/3);
+            text("Third Item Clicked", width/2, height/2);   
+            break;
+          }
+        }
+      }
+      );
+      builder.setPositiveButton("CONFIRM", new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, int which) {
+        }
+      }
+      )
+      .show();
+    }
+  }
+  );
+}
+
+void mousePressed() {
+  dialogBox();
+}
