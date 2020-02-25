@@ -1,0 +1,51 @@
+import android.content.DialogInterface;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.text.Editable;
+import android.widget.EditText;
+
+Activity act;
+
+void setup() {
+  background(#F9C454);
+  fill(#4A3A16);
+  textSize(38);
+  textAlign(CENTER);
+  text("Click on screen", width/2, height/3);
+}
+
+void draw() {
+}  
+
+void dialogBox() {
+  act = this.getActivity();
+  act.runOnUiThread(new Runnable() {
+    public void run() {
+      AlertDialog.Builder builder = new AlertDialog.Builder(act);
+      final EditText input = new EditText(act); 
+      builder.setView(input); 
+      builder.setTitle("strokeWeight:");
+      builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() { 
+        public void onClick(DialogInterface dialog, int whichButton) { 
+          background(#F9C454);
+          text("Click on screen", width/2, height/3);
+          String value = input.getText().toString().trim(); 
+          text(value, width/2, height/2);
+        }
+      }
+      );
+      builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() { 
+        public void onClick(DialogInterface dialog, int whichButton) { 
+          dialog.cancel();
+        }
+      }
+      ); 
+      builder.show();
+    }
+  }
+  );
+}
+
+void mousePressed() {
+  dialogBox();
+}
