@@ -1,0 +1,57 @@
+import processing.core.PApplet;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.widget.TextView;
+import android.view.Gravity;
+
+Activity act;
+TextView msg;
+int msgId;
+
+void setup() {
+  background(0);
+  textSize(38);
+  textAlign(CENTER);
+  text("Click on screen", width/2, height/2);
+}
+
+void draw() {
+}  
+
+void dialogBox() {
+  act = this.getActivity();
+
+  final TextView msg = new TextView(act); 
+  msg.setBackgroundColor(Color.BLUE);
+  msg.setTextSize(32);
+  msg.setText("I am a Custom Dialog Box."); 
+  msg.setGravity(Gravity.CENTER_HORIZONTAL); 
+  msg.setTextColor(Color.WHITE); 
+
+  act.runOnUiThread(new Runnable() {
+    public void run() {
+      AlertDialog.Builder builder = new AlertDialog.Builder(act);
+      builder.setView(msg);
+      builder.setTitle("Do you want to quit?");
+      builder.setPositiveButton("NO", 
+        new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, 
+          int which) {
+        }
+      }
+      );
+      builder.setNegativeButton("YES", 
+        new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, 
+          int which) {
+          act.finish();
+        }
+      }
+      )
+      .show();
+    }
+  }
+  );
+}
