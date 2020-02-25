@@ -1,0 +1,65 @@
+import android.content.DialogInterface;
+import android.app.Activity;
+import android.app.AlertDialog;
+
+final CharSequence[] colors = { "Pink", "Red", "Yellow", "Blue" };
+ArrayList<Integer> slist = new ArrayList();
+boolean icount[] = new boolean[colors.length];
+String msg ="";
+Activity act;
+
+void setup() {
+  background(#F9C454);
+  fill(#4A3A16);
+  textSize(38);
+  textAlign(CENTER);
+  text("Click on screen", width/2, height/3);
+}
+
+void draw() {
+}  
+
+void dialogBox() {
+  act = this.getActivity();
+
+  act.runOnUiThread(new Runnable() {
+    public void run() {
+      AlertDialog.Builder builder = new AlertDialog.Builder(act);
+      builder.setTitle("Choose Colors");
+      builder.setMultiChoiceItems(colors, icount, new DialogInterface.OnMultiChoiceClickListener() {
+        @Override
+          public void onClick(DialogInterface arg0, int arg1, boolean arg2) {
+          if (arg2) {
+            slist.add(arg1);
+          } else if (slist.contains(arg1)) {
+            slist.remove(Integer.valueOf(arg1));
+          }
+        }
+      }
+      );
+      builder.setPositiveButton("CONFIRM", new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, int which) {
+          msg = "";
+          for (int i = 0; i < slist.size(); i++) {
+            msg = msg + "\n" + (i + 1) + " : " + colors[slist.get(i)];
+          }
+          background(#F9C454);
+          text("Click on screen", width/2, height/3);
+          text( "Total " + slist.size() + " Items Selected.\n" + msg, width/2, 2*height/3);
+        }
+      }
+      );
+      builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, int which) {
+        }
+      }
+      )
+      .show();
+    }
+  }
+  );
+}
+
+void mousePressed() {
+  dialogBox();
+}
