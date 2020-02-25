@@ -1,0 +1,320 @@
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.widget.TextView;
+import android.view.Gravity;
+import android.widget.SeekBar;
+import android.widget.LinearLayout;
+import android.graphics.drawable.GradientDrawable;
+import android.widget.RelativeLayout;
+import android.view.WindowManager;
+
+Activity act;
+
+float prg_hue, prg_sat, prg_bright;
+color myHsbColor = #000000, myRgbColor = #000000, mhsbc, mrgbc;
+boolean loop;  // Needed in draw() because noLoop() is not working on Android currently
+
+void setup() {
+  background(220);
+  fill(0);
+  rect(0, 0, width, height/20);
+  if (displayDensity <= 1.8) textSize(30);
+  else if(displayDensity > 1.8 && displayDensity <= 2.8) textSize(45);
+  else textSize(60);
+  textAlign(CENTER);
+  fill(255);
+  text("Tab here to change screen color.", width/2 , height/30);
+  act = this.getActivity();
+}
+
+void draw() {
+  if(loop){
+  
+  colorMode(HSB, 360, 100, 100);  
+  fill(myHsbColor);
+  rect(0, height/20, width, height/2-height/20);
+  textAlign(CENTER);
+  fill(0, 0, 255); 
+  String myHexColor = hex(myHsbColor);
+  text("#"+myHexColor, width/2, height/4);
+  text("HSB ("+int(prg_hue)+", "+int(prg_sat)+", "+int(prg_bright)+")", width/2, height/4+50);
+  
+  colorMode(RGB, 255, 255, 255);
+  fill(myRgbColor);
+  rect(0, height/2, width, height/2);
+  fill(255, 255, 255);
+  myHexColor = hex(myRgbColor);
+  text("#"+myHexColor, width/2, 3*height/4);
+  text("RGB ("+ str(int(red(myRgbColor)))+", "+ str(int(green(myRgbColor)))+", "+str(int(blue(myRgbColor)))+")", width/2, 3*height/4+50);
+  
+  }
+}
+
+void colorPicker() {
+  loop = false;
+  
+  // Main layout to contain all views  
+  final LinearLayout layout = new LinearLayout(act);
+  LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+  layout.setLayoutParams(parms);
+  layout.setPadding(10, 0, 10, 0);
+  layout.setOrientation(LinearLayout.VERTICAL);
+
+  final GradientDrawable gd_hue = new GradientDrawable(); 
+  gd_hue.setStroke(1, Color.BLACK); 
+  gd_hue.setColors(new int[]{
+    Color.RED, 
+    Color.YELLOW, 
+    Color.GREEN, 
+    Color.CYAN, 
+    Color.BLUE, 
+    Color.MAGENTA, 
+    Color.RED
+    });
+  gd_hue.setOrientation(GradientDrawable.Orientation.LEFT_RIGHT);
+
+  final GradientDrawable gd_sat = new GradientDrawable(); 
+  gd_sat.setStroke(1, Color.BLACK); 
+  gd_sat.setColors(new int[]{
+    Color.rgb(0, 0, 0), 
+    Color.WHITE
+    });
+  gd_sat.setOrientation(GradientDrawable.Orientation. RIGHT_LEFT );
+
+  final GradientDrawable gd_bright = new GradientDrawable(); 
+  gd_bright.setStroke(1, Color.BLACK); 
+  gd_bright.setColors(new int[]{
+    Color.BLACK, 
+    Color.rgb(0, 0, 0)
+    });
+  gd_bright.setOrientation(GradientDrawable.Orientation. LEFT_RIGHT );
+
+  final GradientDrawable gd_show = new GradientDrawable(); 
+  gd_show.setColor(Color.rgb(0, 0, 0));
+  gd_show.setStroke(2, Color.BLACK); 
+
+  final TextView tvhue = new TextView(act);
+  tvhue.setTextSize(16);
+  tvhue.setPadding(0, 0, 0, 4);
+  tvhue.setText(" Hue =  0");
+
+  final TextView tvsat= new TextView(act);
+  tvsat.setTextSize(16);
+  tvsat.setPadding(0, 0, 0, 4);
+  tvsat.setText(" Saturation =  0");
+
+  final TextView tvbright= new TextView(act);
+  tvbright.setTextSize(16);
+  tvbright.setPadding(0, 0, 0, 4);
+  tvbright.setText(" Brightness =  0");
+
+  final TextView tvhsb = new TextView(act);
+  tvhsb.setTextSize(16);
+  tvhsb.setPadding(0, 0, 0, 4);
+  tvhsb.setText("Color  #FF000000");
+
+  final TextView separe = new TextView(act);
+  separe.setPadding(0, 0, 0, 20);
+
+  final TextView tvtitle = new TextView(act);  
+  tvtitle.setTextSize(20);
+  tvtitle.setPadding(0, 0, 0, 10);
+  tvtitle.setGravity(Gravity.CENTER | Gravity.TOP);
+  tvtitle.setTextColor(Color.BLACK);
+  tvtitle.setText("\n"+"COLOR SELECTOR");
+
+
+  final TextView tvshowcol = new TextView(act);
+  tvshowcol.setBackground(gd_show);
+  tvshowcol.setPadding(0, 0, 0, 20);
+  final TextView tvbrightcol = new TextView(act);  
+  tvbrightcol.setBackground(gd_bright);
+  final TextView tvsatcol = new TextView(act);  
+  tvsatcol.setBackground(gd_sat);
+  final TextView tvhuecol = new TextView(act);  
+  tvhuecol.setBackground(gd_hue);
+
+
+  final SeekBar sb_hue = new SeekBar(act);
+  sb_hue.setLayoutParams(new RelativeLayout.LayoutParams
+    (LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  sb_hue.setPadding(15, 10, 15, 10);
+  sb_hue.setMax(360);
+  sb_hue.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+    @Override 
+      public void onStartTrackingTouch(SeekBar seekBar) {
+    }
+    @Override 
+      public void onStopTrackingTouch(SeekBar seekBar) {
+    }
+    @Override 
+      public void onProgressChanged (SeekBar seekBar, final int progress, boolean fromUser) { 
+      pushStyle();
+      loop = false;
+      colorMode(HSB, 360, 100, 100);
+      tvhue.setText(" Hue = "+String.valueOf(progress));
+      prg_hue = float(progress);
+
+      // Set color bar color 
+      color c = color(prg_hue, prg_sat, prg_bright);
+      float rvh = red(c)/360*255; 
+      float gvh = green(c)/100*255;
+      float bvh = blue(c)/100*255;
+      mhsbc = c;
+      gd_show.setColor(Color.rgb(int(rvh), int(gvh), int(bvh)));
+      gd_show.setStroke(2, Color.BLACK); 
+      tvshowcol.setBackground(gd_show);
+      tvhsb.setText("Color  #"+hex(c));
+
+      // Set colors of brighness bar.
+      color cp = color(prg_hue, 100, 100);
+      float rvhp = red(cp)/360*255;
+      float gvhp = green(cp)/100*255;
+      float bvhp = blue(cp)/100*255;
+      gd_bright.setColors(new int[]{
+        Color.BLACK, 
+        Color.rgb(int(rvhp), int(gvhp), int(bvhp))
+        });
+      gd_bright.setStroke(2, Color.BLACK); 
+      tvbrightcol.setBackground(gd_bright);
+
+      // Set colors of saturation bar.
+      gd_sat.setColors(new int[]{
+        Color.rgb(int(rvhp), int(gvhp), int(bvhp)), 
+        Color.WHITE
+        });
+      gd_sat.setStroke(1, Color.BLACK); 
+      tvsatcol.setBackground(gd_sat);
+      colorMode(RGB, 255, 255, 255);
+      mrgbc = color(int(rvh), int(gvh), int(bvh));
+      popStyle();
+    }
+  }
+  );
+
+
+  final SeekBar sb_saturation = new SeekBar(act); 
+  sb_saturation.setLayoutParams(new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  sb_saturation.setPadding(15, 10, 15, 10);
+  sb_saturation.setMax(100);
+  sb_saturation.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() { 
+    @Override 
+      public void onStartTrackingTouch(SeekBar seekBar) {
+    }
+    @Override 
+      public void onStopTrackingTouch(SeekBar seekBar) {
+    }
+    @Override 
+      public void onProgressChanged (SeekBar seekBar, final int progress2, boolean fromUser) { 
+      pushStyle();
+      loop = false;
+      colorMode(HSB, 360, 100, 100);
+      tvsat.setText(" Saturation = "+String.valueOf(progress2));
+      prg_sat = float(progress2);
+      color c = color(prg_hue, prg_sat, prg_bright);
+      float rvs = red(c)/360*255; 
+      float gvs = green(c)/100*255;
+      float bvs = blue(c)/100*255;
+      mhsbc = c;
+      gd_show.setColor(Color.rgb(int(rvs), int(gvs), int(bvs)));
+      gd_show.setStroke(2, Color.BLACK); 
+      tvshowcol.setBackground(gd_show);
+      tvhsb.setText("Color  #"+hex(c));
+      colorMode(RGB, 255, 255, 255);
+      mrgbc = color(rvs, gvs, bvs);
+      popStyle();
+    }
+  }
+  );
+
+
+  final SeekBar sb_brightness = new SeekBar(act); 
+  sb_brightness.setLayoutParams(new RelativeLayout.LayoutParams
+    (LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  sb_brightness.setPadding(15, 10, 15, 10);
+  sb_brightness.setMax(100);
+  sb_brightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() { 
+    @Override 
+      public void onStartTrackingTouch(SeekBar seekBar) {
+    }
+    @Override 
+      public void onStopTrackingTouch(SeekBar seekBar) {
+    }
+    @Override 
+      public void onProgressChanged (SeekBar seekBar, final int progress, boolean fromUser) { 
+      pushStyle();
+      loop = false;
+      colorMode(HSB, 360, 100, 100);
+      tvbright.setText(" Brightness = "+String.valueOf(progress));
+      prg_bright = float(progress);
+      color c = color(prg_hue, prg_sat, prg_bright);
+      float rvb = red(c)/360*255; 
+      float gvb = green(c)/100*255;
+      float bvb = blue(c)/100*255;
+      mhsbc = c;
+      gd_show.setColor(Color.rgb(int(rvb), int(gvb), int(bvb)));
+      gd_show.setStroke(2, Color.BLACK); 
+      tvshowcol.setBackground(gd_show);
+      tvhsb.setText("Color  #"+hex(c));
+      colorMode(RGB, 255, 255, 255);
+      mrgbc = color(rvb, gvb, bvb);
+      popStyle();
+    }
+  }
+  );
+
+  layout.addView(tvtitle, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  layout.addView(tvhsb, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  layout.addView(tvshowcol, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  layout.addView(separe, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  layout.addView(tvbright, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  layout.addView(tvbrightcol, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  layout.addView(sb_brightness, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  layout.addView(tvsat, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  layout.addView(tvsatcol, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  layout.addView(sb_saturation, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  layout.addView(tvhue, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  layout.addView(tvhuecol, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  layout.addView(sb_hue, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+  act.runOnUiThread(new Runnable() {
+    public void run() {
+      AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(act);
+      myAlertDialog.setView(layout);
+      myAlertDialog.setPositiveButton("SELECT", 
+        new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, 
+          int which) {
+          myHsbColor = mhsbc;
+          myRgbColor = mrgbc;
+          loop = true;
+        }
+      }
+      );
+      myAlertDialog.setNegativeButton("CANCEL", 
+        new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, 
+          int which) {
+          loop = true;  
+        }
+      }
+      );
+     act.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+      myAlertDialog.show();
+    }
+  }
+  );
+  loop = true;
+}
+
+void mousePressed() {
+  if (mouseY < height/20) {
+    colorPicker();
+  }
+}  
+
+void settings(){
+  fullScreen();
+}  
