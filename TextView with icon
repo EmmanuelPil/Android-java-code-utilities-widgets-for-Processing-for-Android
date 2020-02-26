@@ -1,0 +1,6 @@
+/*
+You need to place the image in the assets folder (After exporting the sketch.
+If you uuse APDE to acces the assets directory; you need a rooted device and an explorer like the app "SD Maid".
+Then you search for the directory "/data/data/com.calsignlabs.apde/app_build" where you can find the assets directory along all others.
+*/
+Will soon be posted
