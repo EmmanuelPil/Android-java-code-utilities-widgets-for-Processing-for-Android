@@ -1,0 +1,41 @@
+import android.content.Intent;
+import android.app.Activity;
+import android.content.pm.PackageManager;
+import android.content.pm.ApplicationInfo; 
+import android.content.pm.PackageInfo;
+import java.util.List;
+
+Activity act;
+PackageManager pm;
+ApplicationInfo packageInfo;
+int i;
+
+void setup() {
+  act = this.getActivity();
+  pm = act.getPackageManager();
+  List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+  for (ApplicationInfo  packageInfo : packages) {
+    if (pm.getLaunchIntentForPackage(packageInfo.packageName)!= null
+      && !pm.getLaunchIntentForPackage(packageInfo.packageName).equals("")) {
+      println("Package Name :" + packageInfo.packageName);
+      println("Launch Intent For Package :"   + pm.getLaunchIntentForPackage(packageInfo.packageName));
+      println("Application Label :"   + pm.getApplicationLabel(packageInfo));
+      println("i : "+i);
+      /*
+      if (i==85) {
+       startActivity(pm.getLaunchIntentForPackage(packageInfo.packageName));
+       break;
+       }
+       */
+      i++;
+    }
+  }
+}
+
+void draw() {
+}
+
+void mousePressed() {
+  // Be sure to have no spaces in packageName string
+  startActivity(pm.getLaunchIntentForPackage("com.android.chrome"));
+}
