@@ -1,0 +1,39 @@
+//  Be sure to give permission WRITE_EXTERNAL_STORAGE
+
+import android.os.Environment;
+Table table; 
+
+void setup() { 
+  table = new Table(); 
+  table.addColumn("id"); 
+  table.addColumn("species"); 
+  table.addColumn("name"); 
+  TableRow newRow = table.addRow(); 
+  newRow.setInt("id", table.getRowCount() - 1); 
+  newRow.setString("species", "Panthera leo"); 
+  newRow.setString("name", "Lion"); 
+  // Folowing file name is the folder you save your table file in.
+  // If it does not exist it will be created automatically
+  String stringFolder = "MyTables";
+  // Folowing string is the name of your text file
+  // Be sure to include extension.
+  String tableFile = "MyTable.csv";
+  saveMyTable(stringFolder, tableFile);
+}
+
+void saveMyTable(String sf, String tf) { 
+  try { 
+    String absolute_path = new String(Environment.getExternalStorageDirectory().getAbsolutePath()); 
+    File file = new File(absolute_path+"/"+sf); 
+    println(file);
+    if (!file.exists()) { 
+      boolean success = true; 
+      success = file.mkdirs();
+    } 
+    saveTable(table, file+"/"+tf);
+    println("File saved successfully.");
+  } 
+  catch (Exception e) { 
+    println("Error while saving file: " + e);
+  }
+}  
