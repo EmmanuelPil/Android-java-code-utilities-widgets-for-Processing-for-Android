@@ -1,0 +1,35 @@
+// Do not forget to give CAMARA permision
+
+import android.hardware.Camera;
+import android.hardware.Camera.Parameters;
+
+public static Camera cam = null;
+boolean on;
+
+void setup () {
+  cam = Camera.open();
+}
+
+void draw () {
+}
+
+void mousePressed () {
+  Parameters p = cam.getParameters();
+  if (p.getFlashMode() != null) {
+    if (on) {
+      p.setFlashMode(Parameters.FLASH_MODE_OFF);
+      cam.setParameters(p);
+      cam.stopPreview();
+    } else {
+      p.setFlashMode(Parameters.FLASH_MODE_TORCH);
+      cam.setParameters(p);
+      cam.startPreview();
+    }
+  }
+  on = ! on;
+}
+
+void onStop () {
+  cam.release();      
+  cam = null;
+}
