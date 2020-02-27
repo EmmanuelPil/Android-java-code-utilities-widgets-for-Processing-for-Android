@@ -1,0 +1,41 @@
+import android.app.Activity;
+boolean ok, choise, blink = true;
+int timer;
+Activity act;
+
+void setup() {
+  size(400, 200);
+  background(100);
+  act = this.getActivity();
+}
+
+void draw() {
+  if (blink) {
+      if (millis() - timer >= 200) {
+      choise = !choise;
+      if (choise) background(255, 0, 0); 
+      else background(0, 0, 255); 
+      timer = millis();
+    }
+  }
+}
+
+void onBackPressed() { 
+  drawText();
+  ok = true;
+  blink = false;
+}
+
+void drawText() {
+  textSize(30);
+  text("Do you really want to quit?", 20, 70);
+  text("Yes", 80, 150);
+  text("No", 280, 150);
+}
+
+void mousePressed() {
+  if (ok) {
+    if (mouseX < width/2) act.finish();
+    else if (mouseX > width/2) blink = true;
+  }
+}
