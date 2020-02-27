@@ -1,0 +1,157 @@
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.PopupMenu;
+import android.widget.PopupMenu.OnMenuItemClickListener;
+import android.widget.TextView;
+import android.app.Activity;
+import android.content.Context;
+import android.widget.FrameLayout;
+import android.view.ViewGroup.LayoutParams;
+import android.view.Gravity;
+import android.R;
+import android.widget.RelativeLayout;
+import processing.android.CompatUtils;
+import android.graphics.Color;
+import android.view.WindowManager;
+import android.support.v7.widget.Toolbar;
+import android.content.ContextWrapper;
+//import android.widget.AppCompat;
+import android.support.v7.view.ContextThemeWrapper;
+import android.os.Bundle;
+import android.view.SubMenu;
+
+Activity act; 
+Context mC;
+FrameLayout fl;
+PopupMenu popupMenu; 
+
+int menuanchorId;
+int menubarId;
+boolean toggle;
+String bg;
+
+
+void setup() {
+  fullScreen();
+  background(80, 80, 255);
+  textAlign(CENTER);
+  textSize(35);
+  text("Click on screen to enable or close menu", width/2, height/2);
+  bg = "red";
+}
+
+void draw() {
+}
+
+public void onStart() {
+  act = this.getActivity();
+  mC= act.getApplicationContext();
+  // To prevent status bar showing up
+  act.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+  TextView menubar = new TextView(act);
+  menubar.setLayoutParams(new RelativeLayout.LayoutParams(width-width/12, width/12));
+  menubar.setTextSize(20);
+  menubar.setX(0);
+  menubar.setY(0);
+  menubar.setGravity(Gravity.CENTER);
+  menubar.setBackgroundColor(Color.rgb(0, 0, 120));
+  menubar.setTextColor(Color.WHITE);
+  menubar.setText("My Popup Menu");
+  menubar.setVisibility(View.GONE);
+  //menubarId=CompatUtils.getUniqueViewId();
+  menubarId = View.generateViewId();
+  menubar.setId(menubarId);
+
+  TextView menuanchor = new TextView(act);
+  menuanchor.setLayoutParams(new RelativeLayout.LayoutParams(width/12, width/12));
+  menuanchor.setTextSize(22);
+  menuanchor.setTextColor(Color.WHITE);
+  menuanchor.setX(width-width/12);
+  menuanchor.setY(0);
+  menuanchor.setBackgroundColor(Color.rgb(0, 0, 120));
+  menuanchor.setGravity(Gravity.CENTER);
+  menuanchor.setText("⋮");
+  menuanchor.setVisibility(View.GONE);
+  //  menuanchorId=CompatUtils.getUniqueViewId();
+  menuanchorId = View.generateViewId();
+  menuanchor.setId(menuanchorId);
+  menuanchor.setOnClickListener(new View.OnClickListener() {
+    public void onClick(View view) {
+      TextView menuanchor = (TextView) act.findViewById(menuanchorId);
+      PopupMenu popupMenu = new PopupMenu(mC, menuanchor);
+      popupMenu.getMenu().add(Menu.NONE, 1, 0, "Red");
+      popupMenu.getMenu().add(Menu.NONE, 2, 1, "Green");
+      popupMenu.getMenu().add(Menu.NONE, 3, 2, "Blue");
+      popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+        public boolean onMenuItemClick(MenuItem item) {
+          switch (item.getItemId()) {
+          case 1:
+            bg = "red";
+            background(255, 0, 0);
+            text("Click on screen to enable or close menu", width/2, height/2);
+            return true;
+          case 2:
+            bg = "green";
+            background(0, 255, 0);
+            text("Click on screen to enable or close menu", width/2, height/2);
+            return true;
+          case 3:
+            bg = "blue";
+            background(0, 0, 255);
+            text("Click on screen to enable or close menu", width/2, height/2);
+            return true;
+          default:
+            return false;
+          }
+        }
+      }
+      );
+
+      if (bg == "red") {
+        popupMenu.getMenu().findItem(1).setVisible(false);
+        popupMenu.getMenu().findItem(2).setVisible(true);
+        popupMenu.getMenu().findItem(3).setVisible(true);
+      }  
+      if (bg == "green") {
+        popupMenu.getMenu().findItem(1).setVisible(true);
+        popupMenu.getMenu().findItem(2).setVisible(false);
+        popupMenu.getMenu().findItem(3).setVisible(true);
+      }  
+      if (bg == "blue") {
+        popupMenu.getMenu().findItem(1).setVisible(true);
+        popupMenu.getMenu().findItem(2).setVisible(true);
+        popupMenu.getMenu().findItem(3).setVisible(false);
+      }  
+
+      popupMenu.show();
+    }
+  }
+  );
+
+  fl = (FrameLayout)act.findViewById(R.id.content);
+  FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+  fl.addView(menubar);
+  fl.addView(menuanchor);
+}
+
+void mousePressed() {
+  act.runOnUiThread(
+    new Runnable() {
+    public void run() {
+      TextView tv = (TextView)act.findViewById(menuanchorId);
+      TextView tvv = (TextView)act.findViewById(menubarId);
+      if (toggle) {
+        tv.setVisibility(View.VISIBLE);
+        tvv.setVisibility(View.VISIBLE);
+      } else {
+        tv.setVisibility(View.GONE);
+        tvv.setVisibility(View.GONE);
+      }
+    }
+  }
+  );
+  toggle =! toggle;
+}
