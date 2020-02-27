@@ -1,9 +1,12 @@
 import android.os.Environment;
 
-int tel = 0, x; 
+String absolute_path = new String(Environment.getExternalStorageDirectory().getAbsolutePath());
+int tel = 0, x;
 boolean no_loop = true;
-String my_folder = "my_frames"; // Must be an existing folder one level above absolute path
-String data_folder_path = new String(Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+my_folder+"/");
+// Folowing file name is the folder you save your frames in.
+// If it does not exist it will be created automatically
+String frames_folder = "my_frames"; 
+
 PImage pi;
 
 void setup() {
@@ -12,21 +15,32 @@ void setup() {
 
 void draw() { 
   if (no_loop) {
-    background(204); 
+    background(200); 
     if (x < 100) { 
       line(x, 0, x, 100); 
-      x = x + 1;
+      x ++;
     } else { 
       no_loop = false;
-    } // Saves each frame as line-000001.png, line-000002.png, etc. 
-    saveFrame("line-"); // numbers(hashtags) will be included in saveFrame()
+    } // Saves each frame as frame-000001.png, frame-000002.png, etc. 
+    saveFrames("frame-######.png");  // numbers(hashtags) will be included in saveFrame()
+  }
+}  
+
+
+void saveFrames(String s) {
+  try {
+    File file = new File(absolute_path+"/"+frames_folder); 
+    if (!file.exists()) { 
+      boolean success = true; 
+      success = file.mkdirs();
+    }
+    int maxHashes = 6; 
+    tel++;
+    String fs = String.format("%1$" + maxHashes + "s", tel).replace(' ', '0');
+    pi = get(0, 0, width, height);
+    pi.save(file+"/"+fs+".png");
+  } 
+  catch (Exception e) { 
+    println("Error while saving frames: " + e);
   }
 }
-
-void saveFrame(String s) {
-  int maxHashes=6; 
-  tel++;
-  String fs = String.format("%1$" + maxHashes + "s", tel).replace(' ', '0');
-  pi = get(0, 0, width, height);
-  pi.save(data_folder_path+s+fs+".png");
-}  
