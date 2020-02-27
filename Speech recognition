@@ -1,0 +1,100 @@
+// Coded by @akenaton
+
+import android.view.View;
+import android.content.Context;
+import android.widget.Button;
+import android.app.Activity;
+import android.view.Gravity;
+import android.graphics.Color;
+import android.speech.RecognizerIntent;
+import android.content.Intent;
+import android.widget.Toast;
+import java.lang.Throwable;
+import java.lang.Exception;
+import java.lang.RuntimeException;
+import android.content.ActivityNotFoundException;
+import java.util.Locale;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.FrameLayout;
+import android.view.View.OnClickListener;
+import android.content.Context;
+import android.speech.SpeechRecognizer;
+
+
+Activity act;
+Intent intent;
+Button bouton;
+private static final int MY_BUTTON1 = 9000;
+FrameLayout fl;
+Context context;
+
+String txt;
+
+void settings() {
+  fullScreen();
+};
+
+public void onStart() {
+  act = this.getActivity();
+  context = act.getApplicationContext();
+
+  bouton = new Button(act);
+  bouton.setText("Start Speaking");
+  bouton.setBackgroundColor(Color.WHITE);
+  bouton.setId(MY_BUTTON1);
+  OnClickListener oclMonBouton = new OnClickListener() {
+    public void onClick(View v) {
+      println("Tab here");
+      startSpeech();
+    }
+  };
+
+  bouton.setOnClickListener(oclMonBouton);
+
+  fl = (FrameLayout)act.getWindow().getDecorView().getRootView();
+  getActivity().runOnUiThread(new Runnable() {
+    //@Override
+    public void run() {
+      FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.TOP); 
+        fl.addView(bouton, params1);
+    }
+  });
+}
+
+void setup() {
+
+  act = this.getActivity();
+}
+
+
+void draw() {
+  fill(255);
+  background(0);
+  if (txt != null) {
+    text(txt, width/2, height/2);
+  }
+}
+
+private void startSpeech() {
+  Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+  try {
+    this.getActivity().startActivityForResult(intent, 666);} 
+  catch (ActivityNotFoundException a) {
+    Toast.makeText(this.getActivity().getApplicationContext(), "This phone does not support this", 
+      Toast.LENGTH_SHORT).show();  }
+}
+
+void onActivityResult(int requestCode, int resultCode, Intent data) {
+  switch (requestCode) {
+  case 666: 
+    {
+      if (resultCode == Activity.RESULT_OK && null != data) {//data are returned && the phone can use speechToText
+        ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+        background(255);
+        txt = (result.get(0));
+        println(txt);
+      }
+      break;
+    }
+  }
+}
