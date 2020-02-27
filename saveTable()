@@ -14,11 +14,11 @@ void setup() {
   newRow.setString("name", "Lion"); 
   // Folowing file name is the folder you save your table file in.
   // If it does not exist it will be created automatically
-  String stringFolder = "MyTables";
-  // Folowing string is the name of your text file
+  String tableFolder = "MyTables";
+  // Folowing string is the name of your table file
   // Be sure to include extension.
   String tableFile = "MyTable.csv";
-  saveMyTable(stringFolder, tableFile);
+  saveMyTable(tableFolder, tableFile);
 }
 
 void saveMyTable(String sf, String tf) { 
