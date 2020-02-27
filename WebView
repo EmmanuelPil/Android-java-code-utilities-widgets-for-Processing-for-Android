@@ -1,0 +1,41 @@
+// Abstract of code by @akenaton
+
+// Do not forget the INTERNET permission
+
+
+import android.webkit.WebViewClient;
+import android.view.ViewGroup.LayoutParams;
+import android.webkit.WebView;
+import android.view.ViewGroup;
+import android.app.Activity;
+import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
+ 
+FrameLayout fl;
+Activity act;
+WebView web;
+WebViewClient wbc;
+ 
+ 
+void settings(){
+  fullScreen();
+}
+ 
+public void onStart() {
+  super.onStart();
+ 
+  act = this.getActivity();
+  wbc = new WebViewClient();
+  web = new WebView(act);
+  web.setLayoutParams(new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT));
+  web.setWebViewClient(wbc);
+  web.getSettings().setJavaScriptEnabled(true);
+  web.loadUrl("http:www.google.com/");
+  fl = (FrameLayout)act.getWindow().getDecorView().getRootView();
+  fl.addView(web);
+}
+ 
+void setup(){
+background(255);
+}
+ 
