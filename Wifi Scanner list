@@ -1,3 +1,5 @@
+// You need permissions INTERNET ACCES_WIFI_STATE CHANGE_WIFI_STATE
+
 import java.util.List;
 import android.content.Context;
 import android.content.BroadcastReceiver;
