@@ -1,3 +1,5 @@
+// Be sure to give permission WRITE_EXTERNAL_STORAGE
+
 import android.os.Environment;
 
 String absolute_path = new String(Environment.getExternalStorageDirectory().getAbsolutePath());
