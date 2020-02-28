@@ -1,0 +1,83 @@
+import android.app.Activity;
+import android.widget.FrameLayout;
+import android.widget.Button;     
+import android.graphics.Color;
+import android.view.View;
+import android.view.ViewGroup.LayoutParams;
+import android.view.View.OnClickListener;
+import android.view.Gravity;
+import android.R;
+import processing.android.CompatUtils;
+
+Activity act;
+FrameLayout fl;
+Button btn1;
+int btn1Id, tel;
+boolean toggle;
+
+void setup() {
+  fullScreen();
+  orientation(PORTRAIT);
+  background(255);
+  fill(0);
+  textAlign(CENTER);
+  textSize(35);
+  text("Click on screen to show button.", width/2, height/2);
+}
+
+void draw() {
+}
+
+@ Override 
+  public void onStart() {
+  super.onStart();
+  act = this.getActivity();
+  btn1 = new Button(act);
+  btn1.setTextSize(30); 
+  btn1.setText("Click");
+  //btn1.setHeight(55); 
+  btn1.setWidth(280); 
+  btn1.setX(width/2-140);
+  btn1.setY(200);
+
+  btn1.setTextColor(Color.WHITE);
+  btn1.setBackgroundColor(Color.rgb(0, 150, 150));
+  btn1Id = CompatUtils.getUniqueViewId();
+  //btn1Id = View.generateViewId();
+  btn1.setId(btn1Id);
+  btn1.setVisibility(View.GONE);
+  btn1.setOnClickListener(new View.OnClickListener() {
+    public void onClick(View v) {
+      background(255);
+      text("Click on button to count.", width/2, height/3);
+      tel++;
+      text("You clicked "+str(tel)+" times", width/2, height/3+100);
+      text("Click on screen to hide button.", width/2, height/3+200);
+    }
+  }
+  );
+  fl = (FrameLayout)act.findViewById(R.id.content);
+  fl.addView(btn1, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.LEFT));
+}
+
+
+void mousePressed() {
+  act.runOnUiThread(
+    new Runnable() {
+    public void run() {
+      Button bt = (Button)act.findViewById(btn1Id);
+      if (toggle) {
+        background(255);
+        text("Click on button to count.", width/2, height/3);
+        bt.setVisibility(View.VISIBLE);
+      } else {
+        background(255);
+        text("Click on screen to show button.", width/2, height/2);
+        bt.setVisibility(View.GONE);
+        tel = 0;
+      }
+    }
+  }
+  );
+  toggle =! toggle;
+}
