@@ -1,1 +1,93 @@
-Soon! Being rectified
+
+//import android.support.v7.app.AlertDialog;
+//import android.support.v7.app.AppCompatActivity;
+
+import android.content.DialogInterface;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.widget.SeekBar; 
+import android.graphics.Color;
+import android.view.View;
+import android.widget.TextView;
+import android.view.Gravity;
+import android.widget.LinearLayout;
+
+Activity act;
+int pgr = 100;
+
+void setup() {
+  background(#F9C454);
+  fill(#4A3A16);
+  textSize(38*displayDensity);
+  textAlign(CENTER);
+  text("Click on screen", width/2, height/3);
+}
+
+void draw() {
+}  
+
+void dialogBox() {
+  act = this.getActivity();
+
+  final LinearLayout layout = new LinearLayout(act); 
+  LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); 
+  layout.setLayoutParams(parms); 
+  layout.setPadding(10, 20, 10, 0); 
+  layout.setOrientation(LinearLayout.VERTICAL);
+
+  final TextView tv = new TextView(act);
+  tv.setBackgroundColor(Color.rgb(220, 220, 255));
+  tv.setTextSize(40);
+  tv.setGravity(Gravity.CENTER);
+  tv.setText(str(pgr));
+  tv.setTextColor(Color.rgb(0, 0, 150));
+
+  final SeekBar seekBar = new SeekBar(act); 
+  seekBar.setMax(250);
+  seekBar.setProgress(pgr);
+  seekBar.setPadding(10, 20, 10, 20);
+  seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() { 
+    @Override 
+      public void onStartTrackingTouch(SeekBar seekBar) {
+    }
+    @Override 
+      public void onStopTrackingTouch(SeekBar seekBar) {
+    }
+    @Override 
+      public void onProgressChanged (SeekBar seekBar, final int progress, boolean fromUser) { 
+      pgr = progress;
+      tv.setText(String.valueOf(pgr));
+    }
+  }
+  );
+
+  layout.addView(tv, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+  layout.addView(seekBar, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+
+  act.runOnUiThread(new Runnable() {
+    public void run() {
+      AlertDialog.Builder builder = new AlertDialog.Builder(act);
+      builder.setView(layout);
+      builder.setPositiveButton("CONFIRM", new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, int which) {
+          background(#F9C454);
+          text("New value = "+pgr, width/2, height/3);
+          text("Click on screen", width/2, height/3-100);
+        }
+      }
+      );
+      builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, int which) {
+        }
+      }
+      )
+      .show();
+    }
+  }
+  );
+}
+
+void mousePressed() {
+  dialogBox();
+}
