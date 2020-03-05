@@ -1,4 +1,4 @@
- // !!! Currently only works for Kitkat 4.4 and below
+ // !!! Currently only works for Kitkat 4.4 and below. For above  I recommend  the selectFile library. 
 
 import android.content.Intent;
 import android.app.Activity;
