@@ -1,0 +1,61 @@
+// Remember to enable the notificatio led in settings.
+// Of course the led only blinks when the screen is off.
+// After the amount of timer set, the notification will be canceled and not be reactivated.
+// Please write an issue if this code worked for you or not mentioning device and Android version.
+
+import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.support.v4.app.NotificationCompat;
+
+Activity act;
+Context context;
+
+int start_time, LED_NOTIFICATION_ID = 0;
+boolean notify_start;
+
+void setup () {
+  act = this.getActivity();
+  context = act.getApplicationContext();
+  background(0);
+  textAlign(CENTER);
+  textSize(30*width/800);
+  text ("Click on screen to activate Led notification", width/2, height/2);
+}
+
+void draw() {
+  if (notify_start) {
+    if (millis()-start_time > 10000) {
+      act.runOnUiThread(new Runnable() { 
+        public void run() { 
+          NotificationManager nm = (NotificationManager) 
+            act.getSystemService (context.NOTIFICATION_SERVICE);
+          nm.cancel(LED_NOTIFICATION_ID);
+        }
+      }
+      );
+      notify_start = false;
+    }
+  }
+}
+
+void notificatioLight() {
+  NotificationManager nm = (NotificationManager) 
+    act.getSystemService(context.NOTIFICATION_SERVICE);
+  Notification notif = new Notification();
+  notif.flags = Notification.FLAG_SHOW_LIGHTS;
+  notif.ledARGB = 0xff00ff00;
+  notif.ledOnMS = 100;
+  notif.ledOffMS = 100;
+  nm.notify(LED_NOTIFICATION_ID, notif);
+}
+
+
+void mousePressed() {
+  background (0);
+  text ("Press power off button", width/2, height/2);
+  start_time = millis();
+  notify_start = true;
+  notificatioLight();
+}
