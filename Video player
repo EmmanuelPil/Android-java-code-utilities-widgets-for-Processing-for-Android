@@ -1,0 +1,262 @@
+// Thanks to @conrad and @akenaton
+// The video also can auto-loop by using mp.setLooping(true); below the line  mp.prepare();
+// The video can be fast forwarded/backwarded with the slider.
+
+import android.media.MediaMetadataRetriever;
+import android.os.Looper;
+import android.app.Activity;
+import android.view.ViewGroup;
+import android.view.View;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
+import android.content.res.Resources;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
+import android.content.Context;
+import java.util.concurrent.TimeUnit;
+
+int t, video_x, video_y, video_width, video_height, video_w, video_h;
+int[] bx_val;
+String video_title;
+String[] txt = {"Play", "Pause", "Rewind"};
+float duration, slider_length, slider_x, slider_y, bw, bs, bys;
+double mp_current_position;
+boolean on_start = true;
+color bg, bc, ds, glow;
+
+AssetFileDescriptor afd;
+Context context;
+Activity act;
+SurfaceView mySurface;
+SurfaceHolder mSurfaceHolder;
+MediaMetadataRetriever metaRetriever;
+MediaPlayer mp;
+Slider slider;
+
+
+void setup() {
+  orientation(PORTRAIT);
+
+  // Colors
+  bg = color(255, 165, 0);  // background
+  ds = color(50, 50, 0);    // dark stroke
+  glow = color(0, 220, 220);// slider button
+  bc = color(255, 100, 0);  // button 
+  background(bg);
+
+  // Video values
+  video_title = "m.mp4"; // video in data folder
+  video_width = 3*width/4; // Set here desired width because video is resized/fit into these values.
+  video_height = height/3; // Desired height
+  video_x = (displayWidth-video_width)/2;
+  video_y = (displayHeight-video_height)/4;
+
+  // Slider values
+  slider_length = video_width; // Normally video width
+  slider_x = (width - slider_length)/2;
+  slider_y = video_y+video_height+height/20;
+  slider = new Slider(slider_x, slider_y, slider_length);
+  slider.update();
+
+  // Draw the buttons
+  textSize(28*displayDensity*1200/height);
+  stroke(ds);
+  strokeWeight(3);
+  bx_val = new int[3]; // x value array of each button, used in mousePressed()
+  for (int i = 0; i < 3; i++) {
+    bs = slider_length/12;      // Space between buttons
+    bw = 5*slider_length/6/3;   // Button width
+    float xu = i*(bw+bs)+slider_x;   
+    bx_val[i] = int(xu);        // Store button x values
+    fill(bc);
+    bys = video_y+video_height;  // Button y values start
+    rect(xu, bys+height/9, bw, height/30, 12);
+    fill(ds);
+    text(txt[i], xu+width/30, bys+height/7.4);
+  }
+  initVideo();
+  mp.start();
+
+  // Draw video time lenght digits
+  textSize(24*displayDensity*1200/height);
+  String str = String.format("%d min, %d sec", 
+    TimeUnit.MILLISECONDS.toMinutes((long) duration), 
+    TimeUnit.MILLISECONDS.toSeconds((long) duration) -
+    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
+    duration)));
+  text(str, slider_x+slider_length-textWidth(str), video_y+video_height+height/30);
+  displayTime();
+}
+
+void draw() {
+  if (on_start) { // Necessary to set first frame
+    mp_current_position = mp.getCurrentPosition();
+    if (mp_current_position > 2) {
+      on_start = false;
+      mp.pause();
+    }
+  }
+  if (mousePressed) {
+    mp_current_position = mp.getCurrentPosition();
+    if (mouseX >= slider_x && mouseX <= slider_x+slider_length) {
+      if (mouseY >= slider_y-height/30 && mouseY <= slider_y+height/30) {
+        slider.update();
+      }
+    }
+  }
+  if (mp.isPlaying()) {
+    mp_current_position = mp.getCurrentPosition();
+    displayTime();
+    slider.setPosition(mp_current_position); // Will be mapped there
+  }
+}
+
+void displayTime() {  // The current video positioning time
+  textSize(24*displayDensity*1200/height);
+  String str = String.format("%d min, %d sec", 
+    TimeUnit.MILLISECONDS.toMinutes((long) mp_current_position), 
+    TimeUnit.MILLISECONDS.toSeconds((long) mp_current_position) -
+    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
+    mp_current_position)));
+  fill(bg);
+  noStroke();
+  float th = textAscent()+textDescent();
+  rect(slider_x-15, video_y+video_height+20, textWidth(str)+30, th);
+  fill(ds);
+  text(str, slider_x, video_y+video_height+height/30);
+} 
+
+void settings() {
+  fullScreen ();
+}
+
+void mousePressed() {
+  for (int i = 0; i < 3; i++) {
+    if (mouseX > bx_val[i] && mouseX < bx_val[i]+bw+bs 
+      && mouseY > bys+height/9 && mouseY < bys+height/9+height/30) {
+      switch(i) {
+      case 0:
+        if (mp.isPlaying() == false) mp.start();
+        break;
+      case 1:
+        if (mp.isPlaying() == true) mp.pause();
+        break;
+      case 2:
+        mp.pause();
+        slider.setPosition(slider_x);
+        mp.seekTo(0);
+        break;
+      }
+    }
+  }
+}
+
+public class Slider {
+  float slider_x, slider_y, slider_length, slider_position;
+  
+  Slider(float _x, float _y, float _l) {
+    slider_x = _x;
+    slider_y = _y;
+    slider_length = _l;
+  } 
+
+  void update() {
+    float sp = map(mouseX-slider_x, 0.0, slider_length, 0.0, duration);
+    if (!on_start) mp.seekTo(int(sp));
+    drawSlider();
+    float loc = mouseX;
+    if (on_start) loc = slider_x;
+    ellipse(loc, slider_y+3, 25, 25);
+  }
+  
+  void setPosition(double mp_current_position) {
+    drawSlider();
+    slider_position = map((float)mp_current_position, 0.0, duration, 0.0, slider_length-1);
+    ellipse(slider_x+slider_position, slider_y+3, 25, 25);
+  }  
+  
+  void drawSlider() {
+    fill(bg);
+    noStroke();
+    rect(slider_x-15, slider_y-15, slider_length+40, 40); // Erase background
+    fill(ds);
+    rect(slider_x, slider_y, slider_length, 5);
+    strokeWeight(3);
+    stroke(glow);
+  }  
+
+  float getVal() {
+    return slider_position;
+  }
+}
+
+
+void initVideo() {
+  act = this.getActivity();
+  context = act.getApplicationContext();
+  Looper.prepare();
+  mp = new MediaPlayer();
+  try {
+    afd = context.getAssets().openFd(video_title);
+    MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
+    metaRetriever.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+    String h = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+    String w = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+    video_w = int(w);
+    video_h = int(h);
+    println("Original video height = "+h+"  width = "+w);
+    
+    mp.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+    mp.prepare();
+    duration = mp.getDuration();
+    println("length = "+afd.getLength());
+    println("duration = "+mp.getDuration());
+    println("startOffset = "+afd.getStartOffset() );
+  }
+  catch (IOException e) {
+    e.printStackTrace();
+  }
+  mySurface = new SurfaceView(act);
+  mSurfaceHolder = mySurface.getHolder();
+  mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+  mSurfaceHolder.addCallback(new SurfaceHolder.Callback() {
+    @Override
+      public void surfaceCreated(SurfaceHolder surfaceHolder) {
+      mp.setDisplay(surfaceHolder);
+      println("Surface  created");
+    }
+    @Override
+      public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
+      mp.setDisplay(surfaceHolder);
+      println("Surface changed");
+    }
+    @Override
+      public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+      println("Surface destroid");
+    }
+  }
+  );
+  act.runOnUiThread(new Runnable() {
+    public void run() {
+      mSurfaceHolder = mySurface.getHolder();
+      mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+      act.addContentView(mySurface, new ViewGroup.LayoutParams(video_width, video_height));
+      mySurface.setZOrderOnTop(true);
+      mySurface.setX(video_x);
+      mySurface.setY(video_y);
+    }
+  }
+  );
+}
+
+void onStop() {
+  if (mp!=null) {
+    mp.release();
+    mp = null;
+    println ("Stopped");
+  }
+  super.onStop() ;
+}
+
