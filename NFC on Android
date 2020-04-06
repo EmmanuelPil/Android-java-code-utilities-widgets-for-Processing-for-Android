@@ -1,0 +1,178 @@
+// Code by @akenaton
+// See topic https://discourse.processing.org/t/nfc-on-android/19126?
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="">
+    <uses-sdk android:minSdkVersion="17" android:targetSdkVersion="26"/>
+    <uses-permission android:name="android.permission.NFC"/>
+    <uses-permission android:name="android.permission.NFC_TRANSACTION_EVENT"/>
+    <application android:icon="@drawable/icon" android:label="">
+        <activity android:name=".MainActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+
+
+///THIS CODE IS FOR READING NFC TAGS; TECH CANNOT BE READ
+/// As it uses pending Intent it will ask with which app you want to continue
+/// This, of course, happens if you have other apps able to read NFC using your permissions (see the Manifest)
+
+////////////////////////////////////////IMPORTS
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.nfc.FormatException;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.Ndef;
+import android.os.Parcelable;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import processing.core.PApplet;
+
+//////////////////////////////////////////GLOBAL VAR
+
+NfcAdapter nfcAdapter;
+PendingIntent pendingIntent;
+IntentFilter writeTagFilters[];
+Tag myTag;
+String txt = "";
+String alerte="";//for info-messages (Nfc not available....)
+Activity act;// we are in a fragment
+Context context;
+ArrayList<String> LeTexte = new ArrayList <String>();//arraylist for displaying decoded nfc messages after they are read
+
+public void onStart() {
+
+  act = this.getActivity();
+  context = act.getApplicationContext();
+
+  nfcAdapter = NfcAdapter.getDefaultAdapter(context);  //instance of nfc
+  if (nfcAdapter == null) {
+    //println("No NFC available on this device");
+    //act.finish();// or other thing, code what you want: in this case:::::
+    alerte = "NO NFC available on this device";
+  } else {
+    ///println("NFC available on this device");
+    alerte = "NFC available on this device";
+  }
+
+  readFromIntent(act.getIntent()); // At this moment if the phone is not on some tag, nothing happens
+  // Create some pending intent because the nfc tag must be tested in the future
+  pendingIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity
+    .class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0); // If a red error appears on the class, dont worry and compile!
+
+  // You can uncomment the lines below if you want that your app gets the tag mmessage (discovered) even in the background, yet theses filters are already declared inside the Manifest
+  // IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);//could be another tag, but this one is the more simple
+  // tagDetected.addCategory(Intent.CATEGORY_DEFAULT);
+  // writeTagFilters = new IntentFilter[] { tagDetected };
+};
+
+public void settings() {  
+  fullScreen();
+}
+
+public void setup() {
+  background(0, 0, 0);
+  //size inside settings();
+}
+
+public void draw() {
+  background(0);
+  textSize(36);/// could be adapted % from your display instead of being hard coded
+  fill(255);
+  for (int i =0; i<LeTexte.size(); i++) {
+    String s= LeTexte.get(i);
+    text("Reading NFC=====" + s, 10, height / 2);
+  }
+  textSize(24);
+  text(alerte, 50, 50);//or elsewhere
+}
+
+
+private void readFromIntent(Intent intent) {
+  String action = intent.getAction();
+  // TECH is listed but will not work, needs xml
+  // as type (see the Manifest) is only for plain text there are tags which cannot be read so easily like smart posters one
+  if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
+    || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
+    || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+
+    Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);//get the raw message from the nfc
+    NdefMessage[] msgs = null;//creating some array (in case of multiple messages)
+    if (rawMsgs != null) {
+      msgs = new NdefMessage[rawMsgs.length];//same length than raw Parcelable[]
+      for (int i = 0; i < rawMsgs.length; i++) {
+        msgs[i] = (NdefMessage) rawMsgs[i];//adding the message to the array
+      }
+    } else {
+      alerte = "message in this tag";
+    }
+    buildTagViews(msgs);
+  } else {
+    println("not any message in this tag");
+  }
+}
+
+private void buildTagViews(NdefMessage[] msgs) {//build tagView because with AS of course these messages or values are displayed inside views
+  if (msgs == null || msgs.length == 0) {
+    alerte = "not any message";
+  } else {
+    alerte ="message received, i'll try to read it";
+  }
+
+  String texteInit= "";
+  // Now we are reading the messages; the method getPayload() returns an array of bytes that represent the tag content recorded       
+  byte[] payload = msgs[0].getRecords()[0].getPayload();
+  // println(payload.toString());uncomment if you want to see what is transmitted!
+
+  /// Translate the bytes into human readable strings choosing UTF && a language
+  String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16"; // Get the Text Encoding
+  int languageCodeLength = payload[0] & 0063; // Get the Language , e.g. "en"
+
+  try {
+    // Get the Text
+    texteInit = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);// we are only interested by the content (String recorded)
+  } 
+  catch (UnsupportedEncodingException e) {
+    alerte = "UnsupportedEncoding"+ e.toString();
+  }
+  LeTexte.add(texteInit);//add the message to the arryList
+}
+
+
+
+@Override
+  // If onNewIntent() is triggered that means that the Mainactivity has got the intent and transmitted it to the sketch
+  public void onNewIntent(Intent intent) { // See inside the Mainactivity where onNewIntent() is coded
+  // act.setIntent(intent); // redundant
+  readFromIntent(intent);
+  if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
+    myTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+  }
+}
+
+@Override
+  public void onPause() {
+  super.onPause();
+  //ToDo
+}
+
+@Override
+  public void onResume() {
+  super.onResume();
+  //ToDo
+};
