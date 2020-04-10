@@ -1,0 +1,60 @@
+// To adapt textSize() and button widths to all possible screen sizes with different pixel densities,
+// textSize * pixelDensity(), will not be sufficient. exactly because screen sizes also differ.
+// A solution is to take the relation, textWidth() / width, as a factor for the textSize.
+// Also to take every object size and position, related to width and height, will leave them equal on every device.
+// Sometimes when both portrait and landscape  orientation are required (if (width > height)) different values for both could be used
+
+void setup() {
+  //orientation(PORTRAIT);
+  rectMode(CENTER);
+  textAlign(CENTER, CENTER);
+  background(0, 0, 200);
+  
+  // Text string values
+  String str = "The big brown fox jumped over the lazy dog";
+  color tc = color (255); // Text color
+  float text_x = 0.5*width; // x value (is the middle of text)
+  float text_y = 0.6*height; // Middle text y value
+  
+  // Set here text string lenght factor Must be done empirically !
+  float tslf = 10;
+  
+   // Calculation to ensure same text widht of the string on different screens
+  textSize(12); // Default text size
+  float tsw = textWidth(str); // Text string width
+  float ftw = width/tsw;  // Factor of text width compared to screen width
+  float tss = tslf*ftw; // Actual text string size to use
+ 
+  // Drawing of text
+  textSize(tss);
+  text(str, text_x, text_y);
+  
+  // Button values
+  String but_name = "Start button"; 
+  float bw = width/5; // Button width relative to screen width
+  float bh = height/30; // Button height relative to screen height
+  color btc = color(255); // Button yext color
+  color bc = color (200, 0, 0); // Button color
+  float but_x = 0.8*width; // Center x value of the button
+  float but_y = 0.85*height; // Center y value
+  
+  // Set here text lenght factor Must be done empirically !
+  float btslf = 11; // Button text size lenght factor
+  
+  // Calculation to ensure same text widht of the button on different screens
+  textSize(12); // Default text size
+  float btw = textWidth(but_name);
+  float fbw = bw/btw;  // Factor of button-width, proportional to screen-width
+  float bts = btslf*fbw; // Actual button text size of to use
+ 
+  // Drawing the button
+  fill (bc);
+  rect(but_x, but_y, bw, bh);
+  textSize(bts);
+  fill(btc);
+  text(but_name, but_x, but_y);
+}
+
+void settings() {
+  fullScreen();
+}  
