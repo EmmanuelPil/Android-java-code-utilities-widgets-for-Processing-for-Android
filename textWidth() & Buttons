@@ -45,7 +45,7 @@ void setup() {
   // Calculation to ensure same text widht of the button on different screens
   textSize(12); // Default text size
   float btw = textWidth(but_name);
-  float fbw = bw/btw;  // Factor of button-width, proportional to screen-width
+  float fbw = bw/btw;  // Factor of button-width, proportional to buttonn-text-width
   float bts = btslf*fbw; // Actual button text size of to use
  
   // Drawing the button
