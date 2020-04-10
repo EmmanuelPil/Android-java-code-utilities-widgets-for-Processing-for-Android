@@ -3,6 +3,7 @@
 // A solution is to take the relation, textWidth() / width, as a factor for the textSize.
 // Also to take every object size and position, related to width and height, will leave them equal on every device.
 // Sometimes when both portrait and landscape  orientation are required (if (width > height)) different values for both could be used
+// In this code, with empirically setting the factor of both text sizes, having a satisfying outcome on one device will have the same on other devices as well
 
 void setup() {
   //orientation(PORTRAIT);
