@@ -1,0 +1,159 @@
+// Coded by @shedMusic
+// Details on https://discourse.processing.org/t/android-midi-sequencer-with-processing-interface/1500/82
+
+import android.app.Activity;
+import android.content.Context;
+import android.os.Bundle ;
+import android.os.Handler ;
+import android.os.Looper ;
+//import android.System ;
+import android.media.midi.* ;
+import android.content.pm.PackageManager ;
+
+Activity act;
+Context context;
+Bundle properties ;
+ShedMidi shedMidi ;
+
+// just for testing ... an array to simulate note start times .. starting at t=0 for first note
+long[] noteStartTimes = new long[16];
+//length in nanoseconds of a single cell in the grid
+long cellLength = (long)(0.125*1000000000L) ; // 1/16th note at 120bpm ... use a bpm slider to update this (using mouseDragged() maybe?)
+
+boolean isPlaying = false ;
+
+
+void setup() {
+  fullScreen(P2D);
+  act = this.getActivity();
+  context = act.getApplicationContext();
+  println("setup m");
+  shedMidi = new ShedMidi() ;
+  for (int i=0; i<16; i++) {
+    noteStartTimes[i] = i*cellLength ;
+  }
+}
+
+void draw() {
+  background(0);
+  fill(255);
+  textSize(40);
+  textAlign(CENTER, CENTER);
+  text("LANDSCAPE", 0, 0, width, height);
+}
+
+void mousePressed() {
+  //would be better to have start & stop buttons , but for testing  ....
+  if (!isPlaying) {
+    isPlaying = true ;
+    thread("playSequence");
+  } else {
+    isPlaying = false ;
+  }
+}
+
+
+//call as a thread e.g. as in mousePressed()
+void playSequence() {
+  long startTime = System.nanoTime();
+  int index = 0 ;
+  while (index < 16 && isPlaying) {
+    if (noteStartTimes[index] < System.nanoTime() - startTime) {   
+      shedMidi.sendMidi();      
+      index++ ;
+    }
+  }
+}
+
+class ShedMidi {
+  MidiManager m ;
+  MidiDevice myOpenDevice ;
+  MidiDeviceInfo[] deviceInfo ;
+  MidiDeviceInfo.PortInfo[] portInfo ;
+  MidiInputPort inputPort ;
+  ShedMidi() {
+    m = (MidiManager)context.getSystemService(Context.MIDI_SERVICE);
+    //check device supports MIDI
+    if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_MIDI)) {
+      // Phone.tablet supports MIDI
+      println("great .... can do midi things");
+      //search for attached devices
+      println("setup deviceInfo");
+      deviceInfo = m.getDevices();
+      if (deviceInfo.length == 0) {
+        println("No MIDI devices found  .. " + deviceInfo.length);
+      } else {
+        println("Num MIDI  Devices found  = " + deviceInfo.length);
+
+        for (int i=0; i<deviceInfo.length; i++) {
+          println("Device " + i);
+          println("  Num MIDI inputs = " + deviceInfo[i].getInputPortCount());
+          println("  Num MIDI outputs = " + deviceInfo[i].getOutputPortCount());
+          properties = deviceInfo[i].getProperties();
+          println("  Manufacturer = " + properties.getString(MidiDeviceInfo.PROPERTY_MANUFACTURER)); 
+          println("  Product =" + properties.getString(MidiDeviceInfo.PROPERTY_PRODUCT));
+          println("  Name = " + properties.getString(MidiDeviceInfo.PROPERTY_NAME));
+          println("  Serial Number = " + properties.getString(MidiDeviceInfo.PROPERTY_SERIAL_NUMBER));
+          //Port Information
+          portInfo = deviceInfo[i].getPorts();
+          println("    Num ports found = " + portInfo.length);
+          for (int j=0; j<portInfo.length; j++) {
+            println("    port " + j + " Name = " + portInfo[j].getName() + "Type = " + portInfo[j].getType());
+          }// end j loop
+          println(""); // to give a blank space in the console
+        }//end i loop
+        //Try to open a device
+        m.openDevice(deviceInfo[0], new MidiManager.OnDeviceOpenedListener() {
+          @Override
+            public void onDeviceOpened(MidiDevice device) {
+            if (device == null) {
+              println("could not open device");
+            } else {
+              myOpenDevice = device;
+              println("device opened and ready for use");
+              //Open input port
+              inputPort = myOpenDevice.openInputPort(0);
+            }//end else
+          }
+        } //end m.opendevice
+        , new Handler(Looper.getMainLooper())
+          );
+      } // end do things with MIDI
+    } else {
+      println("boo .... no midi possible");
+    }
+  }//end constructor
+  //methods
+  
+   
+  void sendMidi() {
+    //Send MIDI note data ... for info .send() is a methid from MidiReceiver class which 
+    byte[] buffer = new byte[32];
+    int numBytes = 0;
+    int channel = 10; // MIDI channels 1-16 are encoded as 0-15.
+    buffer[numBytes++] = (byte)(0x90 + (channel - 1)); // note on
+    buffer[numBytes++] = (byte)42; // closed hi hat
+    buffer[numBytes++] = (byte)127; // max velocity
+    int offset = 0;
+    // post is non-blocking 
+    try {
+      inputPort.send(buffer, offset, numBytes);
+      println("data sent");
+    }
+    catch (Exception e) {
+      println("error sending midi data");
+    }
+  }
+}// end ShedMidi class
+
+
+
+
+
+void onPause() {
+  try {
+    shedMidi.inputPort.close();
+  } 
+  catch(Exception e) {
+  }
+}
