@@ -1,6 +1,7 @@
 // Thanks to @conrad and @akenaton
 // The video also can auto-loop by using mp.setLooping(true); below the line  mp.prepare();
 // The video can be fast forwarded/backwarded with the slider.
+// When used on APDE you have to run it in "App mode"
 
 import android.media.MediaMetadataRetriever;
 import android.os.Looper;
