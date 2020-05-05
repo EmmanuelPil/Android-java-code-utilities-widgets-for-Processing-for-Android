@@ -1,0 +1,39 @@
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.ClipDescription;
+import android.content.Context;
+import android.app.Activity;
+import android.os.Looper;
+
+Activity act;
+Context cnt;
+
+void setup () {
+  background(255);
+  fill(0);
+  textSize(40);
+  textAlign(CENTER);
+  act = this.getActivity();
+  cnt = act.getApplicationContext();
+  Looper.prepare();
+  String str = "myClipboardString";
+  
+  // Copy to clipboard
+  android.content.ClipboardManager clipboard = (android.content.ClipboardManager) cnt.getSystemService(Context.CLIPBOARD_SERVICE);
+  android.content.ClipData clip = android.content.ClipData.newPlainText("text", str);
+  clipboard.setPrimaryClip(clip);
+  
+ // Paste string from clipboard
+  if (clipboard.hasPrimaryClip()) {
+    android.content.ClipDescription description = clipboard.getPrimaryClipDescription();
+    android.content.ClipData data = clipboard.getPrimaryClip();
+    if (data != null && description != null && description.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
+      String str_paste = String.valueOf(data.getItemAt(0).getText());
+      text(str_paste, width/2, height/2);
+    }
+  }
+}
+
+void settings (){
+  fullScreen();
+}
