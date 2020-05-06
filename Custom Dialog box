@@ -20,6 +20,10 @@ void setup() {
 void draw() {
 }  
 
+void mousePressed() {
+  dialogBox();
+}
+
 void dialogBox() {
   act = this.getActivity();
 
