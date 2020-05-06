@@ -1,4 +1,5 @@
 // You need permissions INTERNET ACCES_WIFI_STATE CHANGE_WIFI_STATE
+// Only tested on Kitkat 4.4
 
 import java.util.List;
 import android.content.Context;
