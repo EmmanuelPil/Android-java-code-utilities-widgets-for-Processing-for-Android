@@ -1,0 +1,63 @@
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.content.Context;
+import android.app.Activity;
+
+Activity act;
+Context cnt;
+SharedPreferences sp;
+SharedPreferences.Editor editor;
+
+int myScore;
+String myScoreFile;
+
+void setup () {
+  background(0, 0, 150);
+  textSize (40);
+  textAlign (CENTER);
+  act = this.getActivity();
+  cnt = act.getApplicationContext();
+  sp = PreferenceManager.getDefaultSharedPreferences(cnt);
+  editor = sp.edit();
+  myScoreFile = "TotalScores";
+  myScore = loadScore(myScoreFile);
+  text("Click here to gain points and save them.", width/2, height/4);
+}
+
+void settings() {
+  fullScreen();
+}
+
+void draw () {
+}
+
+void mousePressed () {
+  if (mouseY > height/2) {
+    myScore++;
+    saveScore(myScore, myScoreFile);
+    background(0, 0, 150);
+    text("Click here to gain points and save them.\n My saved score is  "+str(myScore), width/2, height/4);
+    text("Click here to show saved points.", width/2, 3*height/4);
+  } else {
+    myScore = loadScore (myScoreFile);
+    background(0, 0, 150);
+    text("Click here to gain points and save them.", width/2, height/4);
+    text("Click here to show saved points.", width/2, 3*height/4);
+  }
+}
+
+void saveScore(int score, String name) {
+  //editor.clear();
+  editor.putInt(name, score);
+  editor.commit();
+}
+
+int loadScore(String name) {
+  int getScore = sp.getInt(name, 0);
+  return getScore;
+}
+
+void onPause() {
+  super.onPause();
+  saveScore(myScore, myScoreFile);
+}
