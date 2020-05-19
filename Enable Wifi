@@ -1,0 +1,36 @@
+// Permissins needed: ACCESS_WIFI_STATE and CHANGE_WIFI_STATE
+
+import android.net.wifi.WifiManager;
+import android.content.Intent;
+import android.app.Activity;
+import android.content.Context;
+
+Activity act;
+Context cnt;
+boolean toggle;
+WifiManager wifi;
+
+void setup() {
+  background(0, 0, 100); 
+  fill(255);
+  size(400, 400);
+  textAlign(CENTER);
+  textSize(25);
+  text("Click to toggle Wifi On/Off", width/2, height/2);
+  act = this.getActivity();
+  cnt = act.getApplicationContext();
+  wifi = (WifiManager) cnt.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+}
+
+void draw() {
+}
+
+void mousePressed() {
+  if (toggle) {
+    wifi.setWifiEnabled(true);
+    toggle = false;
+  } else {
+    wifi.setWifiEnabled(false);
+    toggle = true;
+  }
+}
