@@ -1,0 +1,19 @@
+import android.database.Cursor;
+import android.content.ContentResolver;
+import android.provider.ContactsContract;
+import android.support.v4.app.ActivityCompat;
+import android.app.Activity;
+
+Activity act;
+
+void setup() {
+  act = this.getActivity(); 
+  Cursor phones = act.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
+  while (phones.moveToNext()) {
+    String contactName = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+    String contactNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+  print(contactName+"  ");
+  println(contactNumber);
+  }
+  phones.close();
+}
