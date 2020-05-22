@@ -1,0 +1,9 @@
+import android.database.Cursor;
+import android.content.Intent;
+import android.net.Uri;
+
+void setup() {
+  Uri number = Uri.parse("tel:123456789");
+  Intent callIntent = new Intent(Intent.ACTION_DIAL, number);
+  startActivity(callIntent);
+}
