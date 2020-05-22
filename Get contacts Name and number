@@ -1,3 +1,5 @@
+// Permission needed is READ_CONTACTS
+
 import android.database.Cursor;
 import android.content.ContentResolver;
 import android.provider.ContactsContract;
