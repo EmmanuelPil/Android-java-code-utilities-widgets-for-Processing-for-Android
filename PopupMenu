@@ -15,12 +15,6 @@ import android.widget.RelativeLayout;
 import processing.android.CompatUtils;
 import android.graphics.Color;
 import android.view.WindowManager;
-import android.support.v7.widget.Toolbar;
-import android.content.ContextWrapper;
-//import android.widget.AppCompat;
-import android.support.v7.view.ContextThemeWrapper;
-import android.os.Bundle;
-import android.view.SubMenu;
 
 Activity act; 
 Context mC;
