@@ -88,7 +88,7 @@ void mousePressed() {
 }
  
 void inputButton (int x, int y, float w, float h) {
-  textSize(60);
+  textSize(50);
   stroke(127);
   rect(x, y, w, h);
   color c2 = color(130, 0, 0);
@@ -100,7 +100,7 @@ void inputButton (int x, int y, float w, float h) {
     line(x, i, x+w, i);
   }
   fill(255);
-  text("     Edit", xbut + 30, ybut + 2*hbut/3);
+  text("Edit", xbut+wbut/3, ybut+2+5*hbut/6);
 }
 
 @ Override 
