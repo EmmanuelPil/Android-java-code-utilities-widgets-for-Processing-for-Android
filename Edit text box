@@ -1,0 +1,154 @@
+ 
+import android.os.Bundle;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.*;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
+import android.widget.EditText;
+import android.text.Editable;
+import android.graphics.Color;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.view.View.OnKeyListener;
+import android.view.View;
+import android.view.KeyEvent;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.view.Gravity;
+import android.R;
+import processing.android.CompatUtils;
+ 
+ 
+Activity act;
+Context mC;
+FrameLayout fl;
+EditText edit;
+int editId;
+
+String txt;
+int xbut, ybut, wbut, hbut;
+ 
+boolean pressed;
+  
+void setup() {
+  fullScreen();
+  background(0, 0, 255);
+  xbut = width/2-width/6;
+  ybut = height/2;
+  wbut = width/3;
+  hbut = height/20;
+  inputButton(xbut, ybut, wbut, hbut);
+}
+ 
+void draw() {
+}
+ 
+void showInputBox() {
+  background(0, 0, 255);
+  inputButton(xbut, ybut, wbut, hbut);  
+  act.runOnUiThread(
+    new Runnable() { 
+      @Override
+    public void run() {
+      EditText et = (EditText)act.findViewById(editId);
+      String txt = et.getText().toString();
+      et.getText().clear();
+      et.setVisibility(View.VISIBLE);
+      et.requestFocus();
+    }
+  }
+  );
+}
+  
+void hideInputBox() {
+  background(0, 0, 255);
+  inputButton(xbut, ybut, wbut, hbut); 
+  textSize(40);
+  String txt = edit.getText().toString();
+  text("Your input was:  " + txt, width/10, height/3);
+  println("Your input was:  " + txt);
+  act.runOnUiThread(
+    new Runnable() {
+      @Override
+    public void run() {
+      EditText et = (EditText)act.findViewById(editId);
+      et.setVisibility(View.GONE);
+    }
+  }
+  );
+}  
+ 
+ 
+void mousePressed() {
+  if (mouseX >= xbut && mouseX <= xbut + wbut &&  mouseY >= ybut && mouseY <= ybut + hbut) { 
+    showInputBox();
+  }
+}
+ 
+void inputButton (int x, int y, float w, float h) {
+  textSize(60);
+  stroke(127);
+  rect(x, y, w, h);
+  color c2 = color(130, 0, 0);
+  color c1 = color(255, 85, 0);
+  for (int i = y; i <= y+h; i++) { 
+    float inter = map(i, y, y+h, 0, 1); 
+    color c = lerpColor(c1, c2, inter); 
+    stroke(c); 
+    line(x, i, x+w, i);
+  }
+  fill(255);
+  text("     Edit", xbut + 30, ybut + 2*hbut/3);
+}
+
+@ Override 
+  public void onCreate(Bundle savedInstanceState) {
+  super.onCreate(savedInstanceState);
+}
+ 
+@ Override 
+  public void onStart() {
+  super.onStart();
+  act = this.getActivity();
+  mC= act.getApplicationContext();
+  act.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+  
+  edit = new EditText(mC);
+  edit.setLayoutParams (new RelativeLayout.LayoutParams (RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
+  edit.setHint("Write Here!");
+  edit.setTextColor(Color.rgb(0, 0, 0));
+  edit.setHintTextColor(Color.rgb(170, 170, 170));  
+  edit.setBackgroundColor(Color.WHITE);      // edit.getBackground().setAlpha(255);  
+  edit.getLayoutParams().width=width/2;  
+  edit.getLayoutParams().height=height/20; 
+  edit.setX(width/4);
+  edit.setY(height/6);
+  edit.requestFocus();
+  edit.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE); // Multiple lines 
+  //edit.setInputType(android.text.InputType.TYPE_CLASS_TEXT);  // Single line
+  editId = CompatUtils.getUniqueViewId();
+  edit.setId(editId);
+  edit.setOnKeyListener(
+    new View.OnKeyListener() {
+    @ Override
+      public boolean onKey(View v, int keyCode, KeyEvent event) {
+      if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode()== KeyEvent.KEYCODE_ENTER) {
+        InputMethodManager imm = (InputMethodManager)v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE); 
+        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        hideInputBox();
+        return true;
+      }
+      return false;
+    }
+  }
+  );
+ 
+  fl = (FrameLayout)act.findViewById(R.id.content);
+  fl.addView(edit);
+ 
+  android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getActivity().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+  imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+}
+ 
