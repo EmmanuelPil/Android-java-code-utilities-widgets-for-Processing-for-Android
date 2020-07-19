@@ -1,0 +1,176 @@
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.PopupMenu;
+import android.widget.PopupMenu.OnMenuItemClickListener;
+import android.widget.TextView;
+import android.app.Activity;
+import android.content.Context;
+import android.widget.FrameLayout;
+import android.view.ViewGroup.LayoutParams;
+import android.view.Gravity;
+import android.R;
+import android.widget.RelativeLayout;
+import processing.android.CompatUtils;
+import android.graphics.Color;
+import android.content.DialogInterface;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.widget.SeekBar; 
+import android.graphics.Color;
+import android.view.View;
+import android.widget.TextView;
+import android.view.Gravity;
+import android.widget.LinearLayout; 
+import android.view.WindowManager; 
+import android.media.MediaPlayer;
+import android.content.res.AssetFileDescriptor;
+import android.content.Context;
+import android.app.Activity;
+Activity act; 
+Context mC;
+FrameLayout fl;
+PopupMenu popupMenu; 
+MediaPlayer mp;
+Context context; 
+AssetFileDescriptor afd;
+int menuanchorId;
+int menubarId;
+boolean toggle;
+String bg; 
+int pgr = 100; 
+int textSize = 100;
+void setup() { 
+  act = this.getActivity();
+  context = act.getApplicationContext();
+  try {
+    mp = new MediaPlayer();
+    afd = context.getAssets().openFd("bgm.mp3");//which is in the data folder
+    println("Successfully loaded audio file");
+    mp.setDataSource(afd.getFileDescriptor());
+    mp.prepare();
+  }
+  catch(IOException e) {
+    println("file did not load");
+  }
+  fullScreen(); 
+  background(#101d25); 
+  textAlign(CENTER); 
+  textSize(36);
+  fill(#969c9f);
+  text("Castle Clash\nTalente & Runen", width/2, height/2); 
+  bg = "red";
+} 
+void draw() {
+  mp.start();
+  if (mp !=null) {
+    mp.start();
+  }
+} 
+public void onStart() { 
+  act = this.getActivity(); 
+  mC= act.getApplicationContext(); // To prevent status bar showing up 
+  act.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN); 
+  TextView menubar = new TextView(act); 
+  menubar.setLayoutParams(new RelativeLayout.LayoutParams(width-width/12, width/12)); 
+  menubar.setTextSize(20); 
+  menubar.setX(0); 
+  menubar.setY(0); 
+  menubar.setGravity(Gravity.CENTER); 
+  menubar.setBackgroundColor(Color.rgb(35, 45, 54)); 
+  menubar.setTextColor(Color.rgb(211, 213, 215));
+  menubar.setText("Magical"); 
+  menubar.setVisibility(View.GONE); //
+  menubarId=CompatUtils.getUniqueViewId(); 
+  menubarId = View.generateViewId(); 
+  menubar.setId(menubarId); 
+  TextView menuanchor = new TextView(act); 
+  menuanchor.setLayoutParams(new RelativeLayout.LayoutParams(width/12, width/12)); 
+  menuanchor.setTextSize(22); 
+  menuanchor.setTextColor(Color.rgb(211, 213, 215));
+  menuanchor.setX(width-width/12); 
+  menuanchor.setY(0); 
+  menuanchor.setBackgroundColor(Color.rgb(35, 45, 54));
+  menuanchor.setGravity(Gravity.CENTER); 
+  menuanchor.setText("⋮"); 
+  menuanchor.setVisibility(View.GONE); // 
+  menuanchorId=CompatUtils.getUniqueViewId(); 
+  menuanchorId = View.generateViewId(); 
+  menuanchor.setId(menuanchorId); 
+  menuanchor.setOnClickListener(new View.OnClickListener() { 
+    public void onClick(View view) { 
+      TextView menuanchor = (TextView) act.findViewById(menuanchorId); 
+      PopupMenu popupMenu = new PopupMenu(mC, menuanchor); 
+      popupMenu.getMenu().add(Menu.NONE, 1, 0, "Text größe\neinstellen");
+      popupMenu.getMenu().add(Menu.NONE, 2, 1, "Red");
+      popupMenu.getMenu().add(Menu.NONE, 3, 2, "Red");
+      popupMenu.getMenu().add(Menu.NONE, 4, 3, "Red");
+      popupMenu.getMenu().add(Menu.NONE, 5, 4, "Green"); 
+      popupMenu.getMenu().add(Menu.NONE, 6, 5, "Blue"); 
+      popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() { 
+        public boolean onMenuItemClick(MenuItem item) { 
+          switch (item.getItemId()) { 
+          case 1: 
+            bg = "red"; 
+            background(255, 0, 0); 
+            text("Klicke um\ndie Text größe\neinzustellen", width/2, height/2); 
+            return true; 
+          case 2: 
+            bg = "green"; 
+            background(0, 255, 0); 
+            text("Click on screen to enable or close menu", width/2, height/2); 
+            return true; 
+          case 3: 
+            bg = "blue"; 
+            background(0, 0, 255); 
+            text("Click on screen to enable or close menu", width/2, height/2); 
+            return true; 
+          default: 
+            return false;
+          }
+        }
+      } 
+      ); 
+      popupMenu.show();
+    }
+  } 
+  ); 
+  fl = (FrameLayout)act.findViewById(R.id.content); 
+  FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER); 
+  fl.addView(menubar); 
+  fl.addView(menuanchor);
+} 
+void mousePressed() { 
+  act.runOnUiThread( new Runnable() { 
+    public void run() { 
+      TextView tv = (TextView)act.findViewById(menuanchorId); 
+      TextView tvv = (TextView)act.findViewById(menubarId); 
+      if (toggle) { 
+        tv.setVisibility(View.VISIBLE); 
+        tvv.setVisibility(View.VISIBLE);
+      } else { 
+        tv.setVisibility(View.GONE); 
+        tvv.setVisibility(View.GONE);
+      }
+    }
+  } 
+  ); 
+  toggle =! toggle;
+}
+
+public void pause() {
+  super.pause();
+  if (mp !=null) {
+    mp.release();
+    mp = null;
+  }
+};
+
+public void stop() {
+  super.stop();
+  if (mp !=null) {
+    mp.release();
+    mp = null;
+  }
+};
