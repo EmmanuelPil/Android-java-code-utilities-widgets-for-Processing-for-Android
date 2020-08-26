@@ -2,11 +2,20 @@
 
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
+import android.app.Activity;
+import android.content.pm.PackageManager;
 
 public static Camera cam = null;
-boolean on;
+boolean on, is_flash_available;
+Activity act;
 
 void setup () {
+  fullScreen ();
+  background (0);
+  orientation (PORTRAIT);
+  act = this.getActivity ();
+  is_flash_available = act.getApplicationContext ().getPackageManager()
+    .hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
   cam = Camera.open();
 }
 
@@ -15,7 +24,7 @@ void draw () {
 
 void mousePressed () {
   Parameters p = cam.getParameters();
-  if (p.getFlashMode() != null) {
+  if (p.getFlashMode() != null && is_flash_available) {
     if (on) {
       p.setFlashMode(Parameters.FLASH_MODE_OFF);
       cam.setParameters(p);
@@ -32,4 +41,11 @@ void mousePressed () {
 void onStop () {
   cam.release();      
   cam = null;
+  act.finish();
+}
+
+void onPause () {
+  cam.release();      
+  cam = null;
+  act.finish();
 }
