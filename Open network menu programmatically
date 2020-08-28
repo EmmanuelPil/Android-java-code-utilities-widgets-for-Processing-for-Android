@@ -1,0 +1,19 @@
+import android.content.Intent;
+
+void setup() {
+  fullScreen();
+  orientation (PORTRAIT);
+  background (0, 0, 150);
+  textSize (60);
+  textAlign (CENTER);
+  text ("Click to open network settings menu.", width/2, height/2);
+}
+
+void draw () {
+}
+
+void mousePressed () {
+  Intent intent = new Intent(Intent.ACTION_MAIN);
+  intent.setClassName("com.android.phone", "com.android.phone.NetworkSetting");
+  startActivity(intent);
+}
