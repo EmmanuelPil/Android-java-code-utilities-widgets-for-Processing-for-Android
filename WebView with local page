@@ -1,0 +1,94 @@
+
+// Just a semple page to include into the data folder together with the images
+// Remember to give INTERNET permission!
+
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>HTML img Tag</title>
+   </head>
+   <body>
+      <img src="image1.png" alt="Image name" width="400"
+         height="480">
+		 <br>
+		 <img src="image2.png" alt="Image name" width="400"
+         height="480">
+		 <br>
+		 <img src="image3.png" alt="Image name" width="400"
+         height="480">
+		 <br>
+		 <img src="image4.png" alt="Image name" width="400"
+         height="480">
+		 <br>
+		 <img src="image5.png" alt="Image name" width="400"
+         height="480">
+		 <br>
+		 <img src="image6.png" alt="Image name" width="400"
+         height="480">
+   </body>
+</html>
+
+
+
+import android.webkit.WebViewClient;
+import android.view.ViewGroup.LayoutParams;
+import android.webkit.WebView;
+import android.view.ViewGroup;
+import android.app.Activity;
+import android.widget.RelativeLayout;
+import android.widget.FrameLayout; 
+import processing.android.CompatUtils;
+import android.view.View;
+
+FrameLayout fl;
+Activity act;
+WebView web;
+WebViewClient wbc; 
+int webId;
+boolean toggle;
+
+public void onStart() { 
+  super.onStart(); 
+  act = this.getActivity(); 
+  wbc = new WebViewClient(); 
+  web = new WebView(act); 
+  web.setLayoutParams(new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)); 
+  web.setY(60);
+  web.setWebViewClient(wbc); 
+  web.getSettings().setJavaScriptEnabled(true); 
+  web.loadUrl("file:///android_asset/new1.html"); 
+  webId = CompatUtils.getUniqueViewId();
+  web.setId(webId);
+  //web.setVisibility(View.GONE);
+  fl = (FrameLayout)act.getWindow().getDecorView().getRootView(); 
+  fl.addView(web);
+} 
+void setup() {
+  background(0, 0, 100);
+  fullScreen();
+  textAlign(CENTER);
+  textSize(40);
+  fill(255);
+  text("Click to open/close WebView", width/2, 45);
+}
+
+void draw() {
+}
+
+void mousePressed() {
+  if (mouseY < 60) {
+    act.runOnUiThread(
+      new Runnable() {
+      public void run() {  
+        WebView wv = (WebView)act.findViewById(webId);
+        if (toggle) {
+          wv.setVisibility(View.VISIBLE);
+        } else {
+          wv.setVisibility(View.GONE);
+        }
+      }
+    }
+    );
+    toggle =! toggle;
+  }
+}
