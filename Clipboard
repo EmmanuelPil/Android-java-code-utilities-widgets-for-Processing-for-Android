@@ -9,6 +9,7 @@ Activity act;
 Context cnt;
 
 void setup () {
+  fullScreen();
   background(255);
   fill(0);
   textSize(40);
@@ -34,6 +35,3 @@ void setup () {
   }
 }
 
-void settings (){
-  fullScreen();
-}
