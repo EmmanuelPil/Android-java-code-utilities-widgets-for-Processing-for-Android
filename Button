@@ -33,7 +33,7 @@ void draw() {
   super.onStart();
   act = this.getActivity();
   btn1 = new Button(act);
-  btn1.setTextSize(30); 
+  //btn1.setTextSize(30); 
   btn1.setText("Click");
   //btn1.setHeight(55); 
   btn1.setWidth(280); 
