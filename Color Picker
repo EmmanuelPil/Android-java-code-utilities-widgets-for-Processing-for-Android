@@ -17,6 +17,7 @@ color myHsbColor = #000000, myRgbColor = #000000, mhsbc, mrgbc;
 boolean loop;  // Needed in draw() because noLoop() is not working on Android currently
 
 void setup() {
+  fullScreen();
   background(220);
   fill(0);
   rect(0, 0, width, height/20);
@@ -313,8 +314,4 @@ void mousePressed() {
   if (mouseY < height/20) {
     colorPicker();
   }
-}  
-
-void settings(){
-  fullScreen();
 }  
