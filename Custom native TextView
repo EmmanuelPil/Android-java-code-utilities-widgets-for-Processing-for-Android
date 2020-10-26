@@ -29,7 +29,7 @@ public void onStart() {
   tv.setY(height/2);
   tv.setGravity(Gravity.CENTER);
   tv.setTextColor(Color.WHITE);
-  tv.setTextSize(32);
+  //tv.setTextSize(32);
   tv.setText ("Hello world");  
 
   fl = (FrameLayout)act.findViewById(R.id.content);
