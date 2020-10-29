@@ -1,61 +1,83 @@
-// To adapt textSize() and button widths to all possible screen sizes with different pixel densities,
-// textSize * pixelDensity(), will not be sufficient. exactly because screen sizes also differ.
-// A solution is to take the relation, textWidth() / width, as a factor for the textSize.
-// Also to take every object size and position, related to width and height, will leave them equal on every device.
-// Sometimes when both portrait and landscape  orientation are required (if (width > height)) different values for both could be used
-// In this code, with empirically setting the factor of both text sizes, having a satisfying outcome on one device will have the same on other devices as well
+/*
+ The following proposed method is meant to ensure that textSize() and object widths and heights, 
+ appear proportionally the same to all possible screen sizes with different pixel densities.
+ 
+ Using solely "textSize * pixelDensity()", will not be sufficient exactly because not only pisel density, 
+ but also screen sizes differ.
+ 
+ One of the possible solutions is to take every object size and position in relation to width and height,
+ and take the relation -textWidth()/width-, as a factor for the textSize.
+ 
+ With this method using the rectMode(CENTER) and textAlign(CENTER, CENTER), will be nescessary for each
+ object and text, to easily center them.
+ 
+ Also using a distinct code for each orientation PORTRAIT and LANDSCAPE with different values for both is recommended.
+ 
+ In this code it is not nescessary to set a textSize, but rather a string_lenght_factor and object_lenght_factor.
+ Just place the objects like e.g. buttons, with position and dimension in relation to width and height,
+ and adjust the object and string factor value to the desired size by empirically trying
+*/
 
 void setup() {
-  //orientation(PORTRAIT);
+  size(400, 800);
+  orientation(PORTRAIT);
   rectMode(CENTER);
   textAlign(CENTER, CENTER);
   background(0, 0, 200);
   
-  // Text string values
-  String str = "The big brown fox jumped over the lazy dog";
-  color tc = color (255); // Text color
-  float text_x = 0.5*width; // x value (is the middle of text)
-  float text_y = 0.6*height; // Middle text y value
+  // Text stringing values
+  String string = "The big brown fox jumped over the lazy dog";
+  color text_color = color (255); 
+  float text_x = 0.5 * width; // x value (is the Center of text)
+  float text_y = 0.5 * height; // and y value in center as well
   
   // Set here text string lenght factor Must be done empirically !
-  float tslf = 10;
+  float string_lenght_factor = 10;
   
-   // Calculation to ensure same text widht of the string on different screens
+  // Calculation to ensure same text widht of the string on different screens
   textSize(12); // Default text size
-  float tsw = textWidth(str); // Text string width
-  float ftw = width/tsw;  // Factor of text width compared to screen width
-  float tss = tslf*ftw; // Actual text string size to use
+  float string_width = textWidth(string); // Text string width
+  float text_width_factor = width / string_width;  // Factor of text width compared to screen width
+  float adapted_text_size = string_lenght_factor * text_width_factor; // Actual text string size to use
  
   // Drawing of text
-  textSize(tss);
-  text(str, text_x, text_y);
+  textSize(adapted_text_size);
+  text(string, text_x, text_y);
   
   // Button values
-  String but_name = "Start button"; 
-  float bw = width/5; // Button width relative to screen width
-  float bh = height/30; // Button height relative to screen height
-  color btc = color(255); // Button yext color
-  color bc = color (200, 0, 0); // Button color
-  float but_x = 0.8*width; // Center x value of the button
-  float but_y = 0.85*height; // Center y value
+  String button_text = "Start button"; 
+  float button_width = width/5; // Set here button width relative to screen width
+  float button_height = height/30; // and the height relative to screen height
+  color button_text_color = color(255); // Button text color
+  color button_color = color (200, 0, 0); 
+  float but_x = 0.8 * width; // Set here button center x value of the button
+  float but_y = 0.85 * height; // and enter y value
   
-  // Set here text lenght factor Must be done empirically !
-  float btslf = 11; // Button text size lenght factor
+  // Set here button text lenght factor Must be done empirically !
+  float button_string_lenght_factor = 11; // Button text size lenght factor
   
   // Calculation to ensure same text widht of the button on different screens
   textSize(12); // Default text size
-  float btw = textWidth(but_name);
-  float fbw = bw/btw;  // Factor of button-width, proportional to buttonn-text-width
-  float bts = btslf*fbw; // Actual button text size of to use
- 
+  float button_text_width = textWidth(button_text);
+  float button_width_factor = button_width / button_text_width;  // Factor of button-width, proportional to buttonn-text-width
+  
+ // float button_height_factor = 
+  float adapted_button_text_size = button_string_lenght_factor * button_width_factor; // Actual button text size of to use
+  
   // Drawing the button
-  fill (bc);
-  rect(but_x, but_y, bw, bh);
-  textSize(bts);
-  fill(btc);
-  text(but_name, but_x, but_y);
+  fill (button_color);
+  rect(but_x, but_y, button_width, button_height); // Remember rectMode(CENTER);
+  textSize(adapted_button_text_size);
+  float button_text_height = textAscent() - textDescent();
+  println(adapted_button_text_size);
+  println(button_text_height);
+  println(button_height);
+  if(adapted_button_text_size > 0.9 * button_height) { // Ensure that button text height is less than 90% button height
+   float button_height_factor = button_height / button_text_height;
+   adapted_button_text_size = adapted_button_text_size * button_height_factor / 2;
+   println(adapted_button_text_size);
+  }
+  textSize(adapted_button_text_size);
+  fill(button_text_color);
+  text(button_text, but_x, but_y);
 }
-
-void settings() {
-  fullScreen();
-}  
