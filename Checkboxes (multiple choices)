@@ -5,15 +5,18 @@ import android.app.AlertDialog;
 final CharSequence[] colors = { "Pink", "Red", "Yellow", "Blue" };
 ArrayList<Integer> slist = new ArrayList();
 boolean icount[] = new boolean[colors.length];
-String msg ="";
+String msg, str;
 Activity act;
 
 void setup() {
-  background(#F9C454);
-  fill(#4A3A16);
-  textSize(38);
-  textAlign(CENTER);
-  text("Click on screen", width/2, height/3);
+  background(0, 0, 200);
+  fill(255);
+  textAlign(CENTER, CENTER);
+  str = "Click to open dialog.";
+  textSize(12);
+  float twf = width/textWidth(str);; 
+  textSize(9*twf);
+  text(str, width/2, height/2);
 }
 
 void draw() {
@@ -43,8 +46,8 @@ void dialogBox() {
           for (int i = 0; i < slist.size(); i++) {
             msg = msg + "\n" + (i + 1) + " : " + colors[slist.get(i)];
           }
-          background(#F9C454);
-          text("Click on screen", width/2, height/3);
+          background(0, 0, 200);
+          text(str, width/2, height/3);
           text( "Total " + slist.size() + " Items Selected.\n" + msg, width/2, 2*height/3);
         }
       }
