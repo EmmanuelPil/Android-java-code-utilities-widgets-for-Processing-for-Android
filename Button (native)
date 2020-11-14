@@ -18,11 +18,14 @@ boolean toggle;
 void setup() {
   fullScreen();
   orientation(PORTRAIT);
-  background(255);
-  fill(0);
-  textAlign(CENTER);
-  textSize(35);
-  text("Click on screen to show button.", width/2, height/2);
+  background(0, 0, 200);
+  fill(255);
+  textAlign(CENTER, CENTER);
+  String str = "Click on screen to show button.";
+  textSize(12);
+  float twf = width/textWidth(str);; 
+  textSize(9*twf);
+  text(str, width/2, height/2);
 }
 
 void draw() {
@@ -36,7 +39,7 @@ void draw() {
   //btn1.setTextSize(30); 
   btn1.setText("Click");
   //btn1.setHeight(55); 
-  btn1.setWidth(280); 
+  //btn1.setWidth(280); 
   btn1.setX(width/2-140);
   btn1.setY(200);
 
@@ -48,7 +51,7 @@ void draw() {
   btn1.setVisibility(View.GONE);
   btn1.setOnClickListener(new View.OnClickListener() {
     public void onClick(View v) {
-      background(255);
+      background(0, 0, 200);
       text("Click on button to count.", width/2, height/3);
       tel++;
       text("You clicked "+str(tel)+" times", width/2, height/3+100);
@@ -67,11 +70,11 @@ void mousePressed() {
     public void run() {
       Button bt = (Button)act.findViewById(btn1Id);
       if (toggle) {
-        background(255);
+        background(0, 0, 200);
         text("Click on button to count.", width/2, height/3);
         bt.setVisibility(View.VISIBLE);
       } else {
-        background(255);
+        background(0, 0, 200);
         text("Click on screen to show button.", width/2, height/2);
         bt.setVisibility(View.GONE);
         tel = 0;
