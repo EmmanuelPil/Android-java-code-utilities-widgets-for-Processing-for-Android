@@ -32,4 +32,3 @@ void saveMyText(String sf, String tf, String[] sh) {
     println("Error while saving file: " + e);
   }
 }  
-
