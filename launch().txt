@@ -11,6 +11,13 @@ ApplicationInfo packageInfo;
 int i;
 
 void setup() {
+  size(displayWidth, displayHeight); background(0, 0, 200); 
+  textAlign(CENTER); 
+  String str = "Click to launch Chrome."; 
+  textSize(12); 
+  float twf = width/textWidth(str); 
+  textSize(8*twf); 
+  text(str, width/2, height/2);
   act = this.getActivity();
   pm = act.getPackageManager();
   List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
@@ -36,7 +43,8 @@ void draw() {
 }
 
 void mousePressed() {
-  // Be sure to have no spaces in packageName string
-  startActivity(pm.getLaunchIntentForPackage("com.android.chrome"));
+  // Change this string to one of the "Package Name" printed in the console // Be sure to have no spaces between quotes
+  String str = "com.android.chrome";
+  startActivity(pm.getLaunchIntentForPackage(str));
 }
 
