@@ -1,0 +1,90 @@
+// For more elaborate listView example see the Mandelbrot example.
+
+import android.app.Activity;
+import android.widget.FrameLayout;     
+import android.graphics.Color;
+import android.view.View;
+import android.view.ViewGroup.LayoutParams;
+import android.view.View.OnClickListener;
+import android.R;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.AdapterView;
+
+String[] myStringArray = {"First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", 
+  "Eighth", "Ninth", "Tenth", "Eleventh", "Twelfth", "Thirteenth", "Fourteenth", "Fifteenth"};
+
+Activity act;
+FrameLayout fl;
+ListView listView;
+int padding_left;
+int padding_right;
+int padding_bottom;
+int padding_top;
+
+void setup() {
+  act = this.getActivity();
+  fullScreen();
+  background(255, 190, 10);
+  fill(0);
+  textAlign(CENTER, CENTER);
+  String str = "Click on screen to show listView.";
+  textSize(12);
+  float twf = width/textWidth(str);
+  textSize(9*twf);
+  text(str, width/2, height/2);
+}
+
+void draw() {
+}
+
+void mousePressed() {
+  act.runOnUiThread(
+    new Runnable() {
+    public void run() {
+      background(255, 190, 10);
+      pushStyle();
+      stroke(160, 60, 0);
+      strokeWeight(20);
+      noFill();
+      rectMode(CENTER);
+      rect(width/2, height/2,width-2*padding_left, height-2*padding_top);
+      popStyle();
+      listView.setVisibility(View.VISIBLE);
+    }
+  }
+  );
+}
+
+@ Override 
+  public void onStart() {
+  super.onStart();
+  act = this.getActivity();
+  padding_left = width/6;
+  padding_right = width/6;
+  padding_bottom = height/6;
+  padding_top = height/6;
+  ArrayAdapter adapter = new ArrayAdapter<String>(act, android.R.layout.simple_list_item_1, myStringArray);
+  listView = new ListView(act);
+  listView.setLayoutParams(new RelativeLayout.LayoutParams(width-padding_left-padding_right, height-padding_top-padding_bottom));
+  listView.setAdapter(adapter);
+  listView.setBackgroundColor(Color.rgb(255, 230, 130));
+  listView.setX(padding_left);
+  listView.setY(padding_top);
+  //listView.setPadding(padding_left, padding_top, padding_right, padding_bottom);
+  listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+      Object list = listView.getItemAtPosition(position);
+      background(255, 190, 10);
+      text("You have chosen item:  "+list, width/2, height/2);
+      text("Click to call list again.", width/2, height/2+100);
+      listView.setVisibility(View.GONE);
+    }
+  }
+  );
+  listView.setVisibility(View.GONE);
+  fl = (FrameLayout)act.findViewById(R.id.content);
+  fl.addView(listView);
+}
