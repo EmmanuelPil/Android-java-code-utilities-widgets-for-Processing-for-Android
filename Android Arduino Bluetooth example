@@ -1,11 +1,10 @@
 // Android/Arduino code with three sliders to adjust the colors of a three-colored led. It also has a toggle button to choose between off, on, (full white), and dim state.
-The pins were chosen for an Android Pro Mini.
+The pins were chosen for an Android Pro Mini. See the images of the wiring setup in the README.md
 This is a 3.3 V Arduino, thus no voltage divider was used on the Rx input. (Absolutely necessary with the 5V model.). This sketch uses the Ketai library. 
 I’ve tested it also sending the signals to another Android device with an app installed called Serial Bluetooth Terminal, which will show the sent characters.
 On one device however it could not read the paired device name, so I entered broadcasting with the MAC Address. The lines are uncommented in the sketch.
 Don’t forget to give all Bluetooth permissions!!
 Tested on a Lollipop and Android 10. If any questions feel free to post.
-![image](https://user-images.githubusercontent.com/31894775/103151805-28179a00-4760-11eb-9139-fdabf51894ba.png)
 
 //--------------------------------------------
 // The Processing code.
