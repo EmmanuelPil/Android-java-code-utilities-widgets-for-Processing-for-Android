@@ -1,0 +1,381 @@
+// Android/Arduino code with three sliders to adjust the colors of a three-colored led. It also has a toggle button to choose between off, on, (full white), and dim state.
+The pins were chosen for an Android Pro Mini.
+This is a 3.3 V Arduino, thus no voltage divider was used on the Rx input. (Absolutely necessary with the 5V model.). This sketch uses the Ketai library. 
+I’ve tested it also sending the signals to another Android device with an app installed called Serial Bluetooth Terminal, which will show the sent characters.
+On one device however it could not read the paired device name, so I entered broadcasting with the MAC Address. The lines are uncommented in the sketch.
+Don’t forget to give all Bluetooth permissions!!
+Tested on a Lollipop and Android 10. If any questions feel free to post.
+
+
+//--------------------------------------------
+// The Processing code.
+//---------------------------------------------
+
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.*; 
+import android.widget.FrameLayout;
+import android.widget.LinearLayout; 
+import android.graphics.Color;
+import android.view.WindowManager;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.view.Gravity;
+import android.R;
+import ketai.net.bluetooth.*;
+import java.lang.reflect.Method;
+import android.graphics.Color;
+import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.os.Bundle;
+import android.widget.SeekBar; 
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
+import android.graphics.Paint;
+import android.graphics.Typeface;
+//import oscP5.*;
+
+String device_name = "HC-05";
+//String device_mac = "40:45:DA:00:25:05";
+String device_mac = "98d3:34:90f40d";
+Activity act; 
+Context mC;
+FrameLayout fl;
+SeekBar seekBar;
+KetaiBluetooth bt;
+int ts, pgr_r = 150, pgr_g = 150, pgr_b = 200, seekbar_width;
+boolean drag;
+int button_toggle_value = 2;
+
+void setup() {
+  fullScreen();
+  orientation(PORTRAIT);
+  background(255, 220, 160);
+  stroke(140, 90, 35);
+  noFill();
+  strokeWeight(width/30);
+  rect(0, 0, width, height);
+  ellipseMode(CENTER);
+  textAlign(CENTER, CENTER);
+  bt.getPairedDeviceNames();
+  bt.start();
+  //bt.connectDevice("40:45:DA:00:25:05");
+  bt.connectToDeviceByName(device_name);
+}
+
+void draw() {
+  stroke(pgr_r/1.2, pgr_g/1.2, pgr_b/1.2);
+  fill(pgr_r, pgr_g, pgr_b);
+  ellipse(width/2, height/4, width/2, width/2);
+}
+
+void mouseDragged() {
+  drag = true;
+}
+
+void mouseReleased () {
+  drag = false;
+}
+void onCreate(Bundle savedInstanceState) {
+  super.onCreate(savedInstanceState);
+  bt = new KetaiBluetooth(this);
+}
+
+@Override 
+  public void onStart() {
+  super.onStart();
+  act = this.getActivity();
+  mC= act.getApplicationContext();
+  act.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+  seekbar_width = width-width/10;
+
+  ShapeDrawable oval = new ShapeDrawable(new OvalShape());
+  oval.setIntrinsicHeight (height);
+  oval.setIntrinsicWidth (width);
+  oval.getPaint().setColor(Color.rgb(150, 100, 35));
+
+  final TextView button = new TextView(act);  
+  button.setLayoutParams(new RelativeLayout.LayoutParams(width/6, width/6));
+  button.setBackground(oval);
+  button.setX(7.4*width/10);
+  button.setY(height/30);
+  String str = "Test to measure the text size.";
+  textSize(12);
+  float twf = width/textWidth(str);
+  ts = int(3.5*twf);
+  button.setText("Dim");
+  button.setGravity(Gravity.CENTER);
+  button.setTextColor(Color.WHITE);
+  button.setTextSize(ts);
+  button.setTypeface(null, Typeface.BOLD);
+  button.setOnClickListener(new View.OnClickListener() {
+    @Override
+      public void onClick(View v) {
+      button_toggle_value++;
+      if (button_toggle_value > 2) button_toggle_value = 0;
+      if (button_toggle_value == 0) {
+        button.setText("Off");
+        pgr_r = 0;
+        pgr_g = 0;
+        pgr_b = 0;
+        String str = "<0,2,"+str(button_toggle_value)+">";
+        byte[] data = str.getBytes();
+        //bt.write(device_mac, data);
+        bt.writeToDeviceName(device_name, data);
+      }
+      if (button_toggle_value == 1) {
+        button.setText("On");
+        pgr_r = 255;
+        pgr_g = 255;
+        pgr_b = 255;
+        String str = "<0,2,"+str(button_toggle_value)+">";
+        byte[] data = str.getBytes();
+        //bt.write(device_mac, data);
+        bt.writeToDeviceName(device_name, data);
+      }
+      if (button_toggle_value == 2) {
+        button.setText("Dim");
+        pgr_r = 80;
+        pgr_g = 80;
+        pgr_b = 80;
+        for (int i = 0; i < 3; i++) {
+          String str = "<80,"+str(i)+","+str(button_toggle_value)+">";
+          byte[] data = str.getBytes();
+          //bt.write(device_mac, data);
+          bt.writeToDeviceName(device_name, data);
+        }
+      }
+    }
+  }
+  );
+
+  final GradientDrawable red_bar = new GradientDrawable(); 
+  red_bar.setColor(Color.rgb(pgr_r, 0, 0));
+  red_bar.setStroke(3, Color.BLACK);
+
+  final GradientDrawable green_bar = new GradientDrawable(); 
+  green_bar.setColor(Color.rgb(0, pgr_g, 0));
+  green_bar.setStroke(3, Color.BLACK);
+
+  final GradientDrawable blue_bar = new GradientDrawable(); 
+  blue_bar.setColor(Color.rgb(0, 0, pgr_b));
+  blue_bar.setStroke(3, Color.BLACK);
+
+  final TextView redBar = new TextView(act);  
+  redBar.setLayoutParams(new RelativeLayout.LayoutParams(seekbar_width, height/20));
+  redBar.setBackground(red_bar);
+  redBar.setX(width/20);
+  redBar.setY(height-height/4.74);
+
+  final TextView greenBar = new TextView(act);  
+  greenBar.setLayoutParams(new RelativeLayout.LayoutParams(seekbar_width, height/20));
+  greenBar.setBackground(green_bar);
+  greenBar.setX(width/20);
+  greenBar.setY(height-height/2.76);
+
+  final TextView blueBar = new TextView(act);  
+  blueBar.setLayoutParams(new RelativeLayout.LayoutParams(seekbar_width, height/20));
+  blueBar.setBackground(blue_bar);
+  blueBar.setX(width/20);
+  blueBar.setY(height-height/1.96);
+
+  SeekBar seekBar1 = new SeekBar(mC); 
+  seekBar1.setLayoutParams (new RelativeLayout.LayoutParams (seekbar_width, height/15));
+  seekBar1.setX(width/20);
+  seekBar1.setY(height-height/7);
+  seekBar1.setMax(250);
+  seekBar1.setProgress(pgr_r);
+  seekBar1.setBackgroundColor(Color.rgb(230, 200, 140));
+  seekBar1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() { 
+    @Override 
+      public void onStartTrackingTouch(SeekBar seekBar) {
+    }
+    @Override 
+      public void onStopTrackingTouch(SeekBar seekBar) {
+    }
+    @Override 
+      public void onProgressChanged (SeekBar seekBar, final int progress, boolean fromUser) { 
+      pgr_r = progress;
+      red_bar.setColor(Color.rgb(pgr_r, 0, 0));
+      red_bar.setStroke(3, Color.BLACK); 
+      redBar.setBackground(red_bar);
+      String str = "<"+str(pgr_r)+",0,"+str(button_toggle_value)+">";
+      byte[] data = str.getBytes();
+      //bt.write(device_mac, data);
+      bt.writeToDeviceName(device_name, data);
+      //OscMessage m = new OscMessage(str);
+      //bt.broadcast(m.getBytes());
+    }
+  }
+  );
+
+  SeekBar seekBar2 = new SeekBar(mC); 
+  seekBar2.setLayoutParams (new RelativeLayout.LayoutParams (seekbar_width, height/15));
+  seekBar2.setX(width/20);
+  seekBar2.setY(height-height/3.4);
+  seekBar2.setMax(250);
+  seekBar2.setProgress(pgr_g);
+  seekBar2.setBackgroundColor(Color.rgb(230, 200, 140));
+  seekBar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() { 
+    @Override 
+      public void onStartTrackingTouch(SeekBar seekBar) {
+    }
+    @Override 
+      public void onStopTrackingTouch(SeekBar seekBar) {
+    }
+    @Override 
+      public void onProgressChanged (SeekBar seekBar, final int progress, boolean fromUser) { 
+      pgr_g = progress;
+      green_bar.setColor(Color.rgb(0, pgr_g, 0));
+      green_bar.setStroke(3, Color.BLACK); 
+      greenBar.setBackground(green_bar);
+      String str = "<"+str(pgr_g)+",1,"+str(button_toggle_value)+">";
+      byte[] data = str.getBytes();
+      //bt.write(device_mac, data);
+      bt.writeToDeviceName(device_name, data);
+      //OscMessage m = new OscMessage(str);
+      //bt.broadcast(m.getBytes());
+    }
+  }
+  );
+
+  SeekBar seekBar3 = new SeekBar(mC); 
+  seekBar3.setLayoutParams (new RelativeLayout.LayoutParams (seekbar_width, height/15));
+  seekBar3.setX(width/20);
+  seekBar3.setY(height-height/2.25);
+  seekBar3.setMax(250);
+  seekBar3.setProgress(pgr_b);
+  seekBar3.setBackgroundColor(Color.rgb(230, 200, 140));
+  seekBar3.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() { 
+    @Override 
+      public void onStartTrackingTouch(SeekBar seekBar) {
+    }
+    @Override 
+      public void onStopTrackingTouch(SeekBar seekBar) {
+    }
+    @Override 
+      public void onProgressChanged (SeekBar seekBar, final int progress, boolean fromUser) { 
+      pgr_b = progress;
+      blue_bar.setColor(Color.rgb(0, 0, pgr_b));
+      blue_bar.setStroke(3, Color.BLACK); 
+      blueBar.setBackground(blue_bar);
+      String str = "<"+str(pgr_b)+",2,"+str(button_toggle_value)+">";
+      byte[] data = str.getBytes();
+      //bt.write(device_mac, data);
+      bt.writeToDeviceName(device_name, data);
+      //OscMessage m = new OscMessage(str);
+      //bt.broadcast(m.getBytes());
+    }
+  }
+  );
+  fl = (FrameLayout)act.findViewById(R.id.content);
+  FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+  fl.addView(redBar);
+  fl.addView(greenBar);
+  fl.addView(blueBar);
+  fl.addView(seekBar1);
+  fl.addView(seekBar2);
+  fl.addView(seekBar3);
+  fl.addView(button);
+}
+
+void onPause() {
+  bt.stop();
+}
+
+void onStop() {
+  bt.stop();
+}
+
+//--------------------------------------------
+//  Ardino code**
+//---------------------------------------------
+
+#include <SoftwareSerial.h>
+#include <Wire.h>
+
+SoftwareSerial mySerial(11, 12); // RX, TX
+
+int red_led = 3;
+int green_led = 6;
+int blue_led = 5;
+int int_1 = 0;
+int int_2 = 0;
+int int_3 = 0;
+const byte number_of_chars = 32;
+char receivedChars[number_of_chars];
+boolean new_data = false;
+
+void setup() {
+  mySerial.begin(9600); // Set the baudrate equal to HC06 setting
+  Serial.begin(9600);
+  pinMode(red_led, OUTPUT);
+  pinMode(green_led, OUTPUT);
+  pinMode(blue_led, OUTPUT);
+}
+
+void loop() {
+  receivePacket();
+  if (new_data == true) {
+    parseData();
+    executeParsedData();
+    new_data = false;
+  }
+}
+
+void receivePacket() {
+  static boolean receiving = false;
+  static byte index = 0;
+  char start_mark = '<';
+  char end_mark = '>';
+  char rc;
+  while (mySerial.available() > 0 && new_data == false) {
+    rc = mySerial.read();
+    if (receiving == true) {
+      if (rc != end_mark) {
+        receivedChars[index] = rc;
+        index++;
+        if (index >= number_of_chars) {
+          index = number_of_chars-1;
+        }
+      } else {
+        receivedChars[index] = '\0';
+        receiving = false;
+        index = 0;
+        new_data = true;
+      }
+    } else if (rc == start_mark) {
+      receiving = true;
+    }
+  }
+}
+
+void parseData() {
+  char * split;
+  split = strtok(receivedChars, ",");
+  int_1 = atoi(split);
+  split = strtok(NULL, ",");
+  int_2 = atoi(split);
+  split = strtok(NULL, ",");
+  int_3 = atoi(split);
+}
+
+void executeParsedData() {
+  if (int_3 == 0) {
+    analogWrite(red_led, 0);
+    analogWrite(green_led, 0);
+    analogWrite(blue_led, 0);
+  } else if (int_3 == 1) {
+    analogWrite(red_led, 255);
+    analogWrite(green_led, 255);
+    analogWrite(blue_led, 255);
+  } else if (int_3 == 2) {
+    if (int_2 == 0) analogWrite(red_led, int_1);
+    if (int_2 == 1) analogWrite(green_led, int_1);
+    if (int_2 == 2) analogWrite(blue_led, int_1);
+  }
+}
