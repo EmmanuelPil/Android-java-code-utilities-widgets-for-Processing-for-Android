@@ -5,7 +5,7 @@ I’ve tested it also sending the signals to another Android device with an app 
 On one device however it could not read the paired device name, so I entered broadcasting with the MAC Address. The lines are uncommented in the sketch.
 Don’t forget to give all Bluetooth permissions!!
 Tested on a Lollipop and Android 10. If any questions feel free to post.
-
+![image](https://user-images.githubusercontent.com/31894775/103151805-28179a00-4760-11eb-9139-fdabf51894ba.png)
 
 //--------------------------------------------
 // The Processing code.
@@ -380,4 +380,3 @@ void executeParsedData() {
   }
 }
 
-![image](https://user-images.githubusercontent.com/31894775/103151757-bccdc800-475f-11eb-8aef-1339524ee868.png)
