@@ -379,3 +379,5 @@ void executeParsedData() {
     if (int_2 == 2) analogWrite(blue_led, int_1);
   }
 }
+
+![image](https://user-images.githubusercontent.com/31894775/103151757-bccdc800-475f-11eb-8aef-1339524ee868.png)
