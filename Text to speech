@@ -1,0 +1,60 @@
+import android.app.Activity;
+import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
+import java.util.Locale;
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.speech.RecognizerIntent;
+import android.content.*; 
+
+String  str = "Hi there. This is your beloved phone speaking to you.";
+
+TextToSpeech my_tts;
+Activity activity;
+Context context;
+
+void setup() {
+  fullScreen();
+  background(0, 0, 200);
+  fill(200);
+  rect(width/4, 7*height/16, width/2, height/8);
+  textAlign(CENTER, CENTER);
+  textSize(60);
+  fill(0);
+  text("SPEAK", width/2, height/2);
+  activity = this.getActivity();
+  context = activity.getApplicationContext();
+}
+
+void draw(){}
+
+void mousePressed() {
+  if (mouseX < 3*width/4 && mouseX > width/4 &&
+    mouseY > 7*height/16 && mouseY < 9*height/16) {
+    try {
+      my_tts = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
+        @Override
+          public void onInit(int status) {
+          if (status == TextToSpeech.SUCCESS) {
+            println("success");
+            my_tts.setLanguage(Locale.UK);
+            my_tts.speak(str, TextToSpeech.QUEUE_FLUSH, null);
+          }
+        }
+      }
+      );
+    } 
+    catch(Exception e) {
+      println(e);
+    }
+  }
+}
+
+public void onPause() {
+  if (my_tts !=null) {
+    my_tts.stop();
+    my_tts.shutdown();
+  }
+  super.onPause();
+}
